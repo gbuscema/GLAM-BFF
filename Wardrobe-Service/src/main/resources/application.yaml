@@ -1,0 +1,24 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  data:
+    mongodb:
+      uri: "mongodb+srv://glam-admin:glam-admin@mongodb-glam.ia09xqm.mongodb.net/glam?retryWrites=true&w=majority"
+  jackson:
+    default-property-inclusion: NON_NULL
+  authorization-enabled: false
+
+logging:
+  level:
+    org.springframework.web: trace
+    org.hibernate: error
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+
