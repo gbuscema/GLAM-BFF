@@ -1,0 +1,94 @@
+openapi: "3.0.3"
+info:
+  title: "glam_bff API"
+  description: "glam_bff API"
+  version: "1.0.0"
+servers:
+  - url: "https://glam_bff"
+tags:
+  - name: "Authentication"
+paths:
+  /authentication/login:
+    post:
+      tags:
+        - "Authentication"
+      summary: "API to login the user in GLAM"
+      description: "Used to login the user in GLAM"
+      operationId: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLoginDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserLoginResponseDTO"
+  /authentication/register:
+    post:
+      tags:
+        - "Authentication"
+      summary: "API to register the user in GLAM"
+      description: "Used to register the user in GLAM"
+      operationId: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistrationDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HttpStatusCode"
+components:
+  schemas:
+    UserLoginDTO:
+      type: "object"
+      properties:
+        password:
+          type: "string"
+        email:
+          type: "string"
+    HttpStatusCode:
+      type: "object"
+      properties: { }
+    UserLoginResponseDTO:
+      type: "object"
+      properties:
+        access_token:
+          type: "string"
+        status_code:
+          $ref: "#/components/schemas/HttpStatusCode"
+        sub:
+          type: "string"
+        name:
+          type: "string"
+        preferred_username:
+          type: "string"
+        given_name:
+          type: "string"
+        family_name:
+          type: "string"
+    UserRegistrationDTO:
+      type: "object"
+      properties:
+        password:
+          type: "string"
+        email:
+          type: "string"
+        firstName:
+          type: "string"
+        lastName:
+          type: "string"
+        locationAgreement:
+          type: "string"
+        gender:
+          type: "string"

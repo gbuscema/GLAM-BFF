@@ -1,13 +1,13 @@
 package com.glam.bff.configuration;
 
 import org.springframework.ai.embedding.EmbeddingClient;
-import org.springframework.ai.vectorstore.MilvusVectorStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.glam.bff.repository.WardrobeVectoreStore;
+import com.glam.bff.repository.WardrobeVectorStore;
 import com.glam.bff.utils.DAORelevantDataUtils;
+import com.glam.bff.utils.WardrobeVectorStoreBuilder;
 
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.param.ConnectParam;
@@ -28,14 +28,46 @@ public class VectorStoreConfiguration {
     }
 
     @Bean
-    WardrobeVectoreStore wardrobeRepository(MilvusServiceClient milvusServiceClient, EmbeddingClient embeddingClient, ObjectMapper objectMapper, DAORelevantDataUtils daoRelevantDataUtils) {
+    WardrobeVectorStoreBuilder wardrobeRepository(MilvusServiceClient milvusServiceClient, EmbeddingClient embeddingClient, ObjectMapper objectMapper, DAORelevantDataUtils daoRelevantDataUtils) {
 
-        MilvusVectorStore.MilvusVectorStoreConfig config = MilvusVectorStore.MilvusVectorStoreConfig.builder()
-//                .withDatabaseName("Glam")
-                .withCollectionName(WardrobeVectoreStore.COLLECTION_NAME)
-                .build();
-        return new WardrobeVectoreStore(milvusServiceClient, embeddingClient, config, objectMapper, daoRelevantDataUtils);
+        WardrobeVectorStoreBuilder builder = new WardrobeVectorStoreBuilder();
+        builder.setMilvusServiceClient(milvusServiceClient);
+        builder.setEmbeddingClient(embeddingClient);
+        builder.setObjectMapper(objectMapper);
+        builder.setDaoRelevantDataUtils(daoRelevantDataUtils);
+
+//        MilvusVectorStore.MilvusVectorStoreConfig config = MilvusVectorStore.MilvusVectorStoreConfig.builder()
+////                .withDatabaseName("Glam")
+//                .withCollectionName(WardrobeVectoreStore.COLLECTION_NAME)
+//                .build();
+        return builder;
     }
+
+    @Bean
+    WardrobeVectorStore wardrobeRepositoryBuilder(WardrobeVectorStoreBuilder builder) throws Exception {
+
+//        WardrobeVectorStoreBuilder builder = new WardrobeVectorStoreBuilder();
+//        builder.setMilvusServiceClient(milvusServiceClient);
+//        builder.setEmbeddingClient(embeddingClient);
+//        builder.setObjectMapper(objectMapper);
+//        builder.setDaoRelevantDataUtils(daoRelevantDataUtils);
+        builder.setCollectionName("1");
+//        MilvusVectorStore.MilvusVectorStoreConfig config = MilvusVectorStore.MilvusVectorStoreConfig.builder()
+////                .withDatabaseName("Glam")
+//                .withCollectionName(WardrobeVectoreStore.COLLECTION_NAME)
+//                .build();
+        return builder.build();
+    }
+
+//    @Bean
+//    ApplicationRunner saveWardrobe(UserWardrobeRepository repository, WardrobeVectoreStore vectoreStore) {
+//        return args -> {
+//            List<GarmentDAO> all = repository.findAll();
+//            for (GarmentDAO garment : all) {
+//                vectoreStore.save(garment);
+//            }
+//        };
+//    }
 
 //    @Bean
 //    ApplicationRunner saveWardrobe(ResourceLoader resourceLoader, WardrobeRepository wardrobeRepository, ObjectMapper objectMapper) throws IOException {

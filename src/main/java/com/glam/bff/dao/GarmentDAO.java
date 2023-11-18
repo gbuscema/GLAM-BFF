@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
+
+import java.util.List;
 
 @Document
 @Data
@@ -20,6 +23,7 @@ public class GarmentDAO {
     @DocumentReference
     private GarmentPhotoDAO photo;
 
+    @Indexed
     private String userId;
 
     private String title;
@@ -44,8 +48,6 @@ public class GarmentDAO {
 
     private String condition;
 
-    private String season;
-
     private String sleeveLength;
 
     private String length;
@@ -53,4 +55,9 @@ public class GarmentDAO {
     private String sizeEnum;
 
     private String patternDetail;
+
+    private List<String> season;
+
+    private List<String> styles;
+
 }

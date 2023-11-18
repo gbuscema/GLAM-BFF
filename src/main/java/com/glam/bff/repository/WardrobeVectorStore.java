@@ -1,7 +1,6 @@
 package com.glam.bff.repository;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.ai.document.Document;
@@ -18,15 +17,15 @@ import io.milvus.client.MilvusServiceClient;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class WardrobeVectoreStore extends MilvusVectorStore {
+public class WardrobeVectorStore extends MilvusVectorStore {
 
-    public static final String COLLECTION_NAME = "wardrobe";
+    public static final String COLLECTION_NAME_PREFIX = "wardrobe_";
 
     private final ObjectMapper objectMapper;
 
     private final DAORelevantDataUtils daoRelevantDataUtils;
 
-    public WardrobeVectoreStore(MilvusServiceClient milvusServiceClient, EmbeddingClient embeddingClient,
+    public WardrobeVectorStore(MilvusServiceClient milvusServiceClient, EmbeddingClient embeddingClient,
             MilvusVectorStoreConfig config, ObjectMapper objectMapper, DAORelevantDataUtils daoRelevantDataUtils) {
         super(milvusServiceClient, embeddingClient, config);
         this.objectMapper = objectMapper;
@@ -35,18 +34,25 @@ public class WardrobeVectoreStore extends MilvusVectorStore {
 
     public void save(GarmentDAO garment) {
         Map<String, Object> objectAsMap = objectMapper
-                .convertValue(garment, new TypeReference<>() {});
+                .convertValue(garment, new TypeReference<>() {
+                });
         objectAsMap.keySet().removeIf(k -> !daoRelevantDataUtils.getRelevantData(GarmentDAO.class).contains(k));
 
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("garmentId", garment.getGarmentId());
-        try{
-            Document document = new Document(objectMapper.writeValueAsString(objectAsMap), metadata);
+        try {
+            Document document = new Document(garment.getGarmentId(), objectMapper.writeValueAsString(objectAsMap), Collections.emptyMap());
             super.add(Collections.singletonList(document));
-        }catch (JsonProcessingException ex){
+        } catch (JsonProcessingException ex) {
             log.error(ex.getMessage(), ex);
             throw new RuntimeException(ex);
         }
+    }
+
+    public void delete(String garmentId) {
+        super.delete(Collections.singletonList(garmentId));
+    }
+    public void update(GarmentDAO garment) {
+       this.delete(garment.getGarmentId());
+       this.save(garment);
     }
 
 }

@@ -7,3 +7,4 @@ volumes/
 volumes/
 .DS_Store
 .idea
+!Dockerfile

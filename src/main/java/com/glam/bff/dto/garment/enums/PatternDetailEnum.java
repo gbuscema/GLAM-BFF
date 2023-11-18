@@ -2,6 +2,8 @@ package com.glam.bff.dto.garment.enums;
 
 import java.util.List;
 
+import org.apache.commons.text.similarity.LevenshteinDistance;
+
 public enum PatternDetailEnum {
 
   ORIZONTAL_STRIPES("Orizontal-Stripes"),
@@ -25,13 +27,21 @@ public enum PatternDetailEnum {
   }
 
   public static PatternDetailEnum searchMatch(String valueToMatch) {
+    var stringComparer = new LevenshteinDistance();
     var values = List.of(PatternDetailEnum.values());
     var normalizedValueToMatch = valueToMatch.toLowerCase();
     PatternDetailEnum mappedValue = null;
+    var minDistance = Integer.MAX_VALUE;
     for (PatternDetailEnum value : values) {
-      if (value.value.toLowerCase().equals(normalizedValueToMatch))
+      var distance = stringComparer.apply(value.value.toLowerCase(), normalizedValueToMatch);
+
+      if (distance < minDistance) {
+        minDistance = distance;
         mappedValue = value;
+      }
+      // if (value.value.toLowerCase().contains(normalizedValueToMatch))
+      // mappedValue = value;
     }
-    return mappedValue;
+    return minDistance < 2 ? mappedValue : null;
   }
 }

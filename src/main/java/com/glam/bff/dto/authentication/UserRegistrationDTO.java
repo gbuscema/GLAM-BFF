@@ -8,21 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRegistrationDTO {
+public class UserRegistrationDTO extends UserInfoDTO{
 
   @JsonProperty("password")
   private String password;
-
-  @JsonProperty("email")
-  private String email;
-
-  @JsonProperty("firstName")
-  private String firstName;
-
-  @JsonProperty("lastName")
-  private String lastName;
-
-  @JsonProperty("locationAgreement")
-  private String locationAgreement;
 
 }

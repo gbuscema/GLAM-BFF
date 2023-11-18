@@ -18,8 +18,11 @@ import com.glam.bff.model.Match;
 import com.glam.bff.model.Wardrobe;
 import com.glam.bff.utils.DAORelevantDataUtils;
 import com.glam.bff.utils.OpenAIUtils;
+import com.sun.jdi.Location;
 
 import lombok.extern.slf4j.Slf4j;
+
+import static com.glam.bff.utils.Constants.*;
 
 @Slf4j
 @Service
@@ -48,16 +51,18 @@ public class ChatCompletionClient {
         return openAiApi.generate(prompt);
     }
 
-    public <T> AiResponse createTodayOutfit(Map<String, Object> parameters, List<GarmentDAO> garments, Class<T> outputClass) {
-
+    public <T> AiResponse suggestOutfit(Map<String, Object> parameters, List<GarmentDAO> garments, Class<T> outputClass) {
+        log.debug("suggestion parmeters {}", parameters);
         // columns constraint sentence
         List<Match> garmentsMatches = garmentDTOMapper.garmentsDaoToMatch(garments);
-        String rawPrompt = OpenAIUtils.getTodayOutfitPrompt(garmentsMatches, daoRelevantDataUtils.getRelevantData(GarmentDAO.class), LayoutEnum.valueOf(parameters.get("layout").toString()));
+        String rawPrompt = OpenAIUtils.getOutfitSuggestionPrompt(garmentsMatches, daoRelevantDataUtils.getRelevantData(GarmentDAO.class), LayoutEnum.valueOf(parameters.get(LAYOUT).toString()));
 
         BeanOutputParser<T> outputParser = new BeanOutputParser<>(outputClass);
         // generate prompt for user message
         PromptTemplate promptTemplate = new PromptTemplate(rawPrompt);
-        promptTemplate.add("locationInfo", OpenAIUtils.getLocationInfo(parameters.get("location").toString(), parameters.get("date").toString()));
+        promptTemplate.add("userPrompt", OpenAIUtils.getUserPromptPhrase(parameters.get(USER_PROMPT)));
+        promptTemplate.add("myStyles", OpenAIUtils.getMyStylesInfo(parameters.get(MY_STYLES)));
+        promptTemplate.add("locationInfo", OpenAIUtils.getLocationInfo(parameters.get(LOCATION), parameters.containsKey(DATE) ? parameters.get(DATE).toString() : null));
         promptTemplate.add("responseFormat", outputParser.getFormat());
         Prompt prompt = promptTemplate.create();
         log.debug("prompt: {}", prompt);

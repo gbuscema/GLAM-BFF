@@ -12,6 +12,8 @@ public class GarmentDTO extends BasicGarmentDTO {
 
     private String garmentId;
 
+    private String externalStoreUrl;
+
     public static GarmentDTO getJson(String user) throws IOException {
 
         GarmentDTO garmentJson = new GarmentDTO();

@@ -16,6 +16,9 @@ import java.util.List;
 @AllArgsConstructor
 public abstract class AbstractGarment{
 
+    @JsonProperty("description")
+    public String description;
+
     @JsonProperty("mainColor")
     public String mainColor;
 

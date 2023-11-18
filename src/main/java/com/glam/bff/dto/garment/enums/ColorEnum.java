@@ -14,6 +14,8 @@ public enum ColorEnum {
   LIGHT_BLUE("Light-Blue", 173, 216, 230),
   RED("Red", 255, 0, 0),
   GREEN("Green", 0, 255, 0),
+  DARK_SEA_GREEN("Dark-Sea-Green", 33, 94, 79),
+  DARK_GREEN("Dark-Green", 3, 82, 24),
   OLIVE_GREEN("Olive-Green", 112, 130, 56),
   YELLOW("Yellow", 255, 255, 0),
   BROWN("Brown", 66, 40, 14),
@@ -48,6 +50,10 @@ public enum ColorEnum {
   public int computeMSE(int pixR, int pixG, int pixB) {
     return (int) (((pixR - r) * (pixR - r) + (pixG - g) * (pixG - g) + (pixB - b)
         * (pixB - b)) / 3);
+  }
+
+  public String toString() {
+    return String.format("#%02x%02x%02x", this.r, this.g, this.b);
   }
 
   public static ColorEnum searchMatch(float pixR, float pixG, float pixB) {

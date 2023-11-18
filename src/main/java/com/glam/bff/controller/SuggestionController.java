@@ -1,7 +1,11 @@
 package com.glam.bff.controller;
 
+import static com.glam.bff.utils.Constants.LAYOUT;
+import static com.glam.bff.utils.Constants.LOCATION;
 import static com.glam.bff.utils.Constants.USER_ID;
+import static com.glam.bff.utils.Constants.USER_PROMPT;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +44,30 @@ public class SuggestionController {
             summary = "Retrieve the today outfit",
             description ="Retrieve the today outfit based on user preferences and location")
     @Parameters({
-            @Parameter(name = "userId", required = true, example = "1", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "layout", required = true, example = "GENERIC", schema = @Schema(implementation = LayoutEnum.class)),
-            @Parameter(name = "location", required = true, example = "Ibiza", schema = @Schema(implementation = String.class))
+            @Parameter(name = USER_ID, required = true, example = "1", schema = @Schema(implementation = String.class)),
+            @Parameter(name = LAYOUT, example = "GENERIC", schema = @Schema(implementation = LayoutEnum.class)),
+            @Parameter(name = LOCATION, example = "Ibiza", schema = @Schema(implementation = String.class))
     })
-    public TodayOutfitDTO todayOutfit(Map<String, Object> parameters) throws JsonProcessingException {
-
+    public TodayOutfitDTO todayOutfit(@RequestParam Map<String, Object> parameters) throws JsonProcessingException {
+        parameters.putIfAbsent(LAYOUT, LayoutEnum.GENERIC.name());
         return suggestionService.todayOutfit(parameters);
+    }
+
+    @GetMapping("/outfit/suggested")
+    @Tag(name = "Suggestion")
+    @Operation(
+            summary = "Retrieve an outfit given a prompt",
+            description ="Retrieve an outfit given a textual prompt by user")
+    @Parameters({
+            @Parameter(name = USER_ID, required = true, example = "1", schema = @Schema(implementation = String.class)),
+            @Parameter(name = USER_PROMPT, example = "I want a total black outfit", required = true, schema = @Schema(implementation = String.class))
+    })
+    public TodayOutfitDTO suggestedOutfit(@RequestParam(USER_ID) String userId, @RequestParam(USER_PROMPT) String prompt) throws JsonProcessingException {
+
+        Map<String, Object> map = new HashMap<>();
+        map.put(USER_ID, userId);
+        map.put(USER_PROMPT, prompt);
+        map.putIfAbsent(LAYOUT, LayoutEnum.GENERIC.name());
+        return suggestionService.todayOutfit(map);
     }
 }

@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.glam.bff.utils.Constants.OUTFIT_ID;
-import static com.glam.bff.utils.Constants.USER_ID;
+import static com.glam.bff.utils.Constants.*;
 
 @RestController
 @RequestMapping("/outfits")
@@ -83,6 +82,23 @@ public class OutfitController {
             @RequestBody BasicOutfitDTO outfitDTO) throws Exception {
 
         return outfitService.updateUserOutfit(outfitId, userId, outfitDTO);
+
+    }
+    @PutMapping("/{outfitId}/users/{userId}/favorite")
+    @Tag(name = "Outfit")
+    @Operation(
+            summary = "API to set the outfit's favorite setting in GLAM",
+            description =
+                    "Used to set the outfit's favorite setting")
+    public OutfitDTO updateUserOutfitFavorite(
+            @PathVariable(OUTFIT_ID)
+            final String outfitId,
+            @PathVariable(USER_ID)
+            final String userId,
+            @RequestParam(value = IS_FAVORITE, required = true)
+            final Boolean isFavorite) throws Exception {
+
+        return outfitService.updateUserOutfitFavorite(outfitId, userId, isFavorite);
 
     }
 

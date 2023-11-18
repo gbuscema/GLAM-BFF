@@ -1,14 +1,18 @@
 package com.glam.bff.service;
 
-import static com.glam.bff.utils.JsonUtils.convertJsonFileIntoObject;
+import static com.glam.bff.dto.garment.enums.CategoryEnum.externalStoreMap;
+import static com.glam.bff.utils.Constants.LAYOUT;
+import static com.glam.bff.utils.Constants.USER_ID;
 import static com.glam.bff.utils.JsonUtils.convertJsonIntoOutfit;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+import com.glam.bff.dto.garment.enums.CategoryEnum;
 import org.springframework.ai.client.AiResponse;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.retriever.VectorStoreRetriever;
@@ -25,18 +29,18 @@ import com.glam.bff.client.openai.ChatCompletionClient;
 import com.glam.bff.dao.GarmentDAO;
 import com.glam.bff.dto.garment.GarmentDTO;
 import com.glam.bff.dto.garment.enums.LayoutEnum;
+import com.glam.bff.dto.outfit.BasicOutfitDTO;
 import com.glam.bff.dto.outfit.TodayOutfitDTO;
 import com.glam.bff.dto.recommendation.RecommendationChatRequestDTO;
 import com.glam.bff.dto.recommendation.UserMatchDTO;
 import com.glam.bff.dto.recommendation.UserRecommendationDTO;
-import com.glam.bff.mapper.recommendation.UserMatchDTOMapper;
 import com.glam.bff.mapper.wardrobe.GarmentDTOMapper;
 import com.glam.bff.model.Garment;
 import com.glam.bff.model.Match;
 import com.glam.bff.model.Outfit;
 import com.glam.bff.model.Wardrobe;
 import com.glam.bff.repository.UserWardrobeRepository;
-import com.glam.bff.repository.WardrobeVectoreStore;
+import com.glam.bff.utils.WardrobeVectorStoreBuilder;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,7 +64,10 @@ public class SuggestionService {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private WardrobeVectoreStore wardrobeVectoreStore;
+    private AuthenticationService authenticationService;
+
+    @Autowired
+    private WardrobeVectorStoreBuilder wardrobeVectorStoreBuilder;
 
     @Autowired
     private UserWardrobeRepository userWardrobeRepository;
@@ -78,8 +85,8 @@ public class SuggestionService {
         Resource fileResource = resourceLoader.getResource("classpath:mockup/mockWardrobe.json");
 //        Wardrobe wardrobe = wardrobeRepository.retrieveWardRobe();
         Wardrobe  wardrobe = new Wardrobe();
-        List<Garment> garmentList = Arrays.asList((Garment[]) convertJsonFileIntoObject(fileResource.getInputStream(), Garment[].class));
-        wardrobe.setGarments(garmentList);
+//        List<Garment> garmentList = Arrays.asList((Garment[]) convertJsonFileIntoObject(fileResource.getInputStream(), Garment[].class));
+        wardrobe.setGarments(new ArrayList<>());
 
         // 1. Get suggestions from OpenAI
         AiResponse createChatCompletionResponse = chatCompletionClient
@@ -88,13 +95,11 @@ public class SuggestionService {
         log.debug("jsonStringResponse {}", jsonStringResponse);
         Outfit outfit = convertJsonIntoOutfit(jsonStringResponse);
 
-//        UserMatchDTOMapper userMatchDTOMapper =
-//                applicationContext.getBean(UserMatchDTOMapper.class);
 
         // 2. For each suggestion -> find nearest with wardrobe
         for(Garment garment : outfit.getMatches()){
 
-            List<Document> retrievedDocuments = new VectorStoreRetriever(wardrobeVectoreStore, 10).retrieve(garment.toString());
+            List<Document> retrievedDocuments = new VectorStoreRetriever(wardrobeVectorStoreBuilder.getWardrobeVectorStore(), 10).retrieve(garment.toString());
 
             for(Document document : retrievedDocuments){
                 Match match = objectMapper.readValue(document.getContent(), Match.class);
@@ -102,11 +107,6 @@ public class SuggestionService {
                     userWardrobeRepository.findByGarmentId(document.getMetadata().get("garmentId").toString());
                 }
             }
-
-
-////            Match match = knnClient.getNearestOutfit(garment, garmentWeight, wardrobeTempFile);
-//            UserMatchDTO userMatchDTO = userMatchDTOMapper.modelToDTO(match);
-//            matches.add(userMatchDTO);
 
         }
 
@@ -118,56 +118,96 @@ public class SuggestionService {
     }
 
     public TodayOutfitDTO todayOutfit(Map<String, Object> parameters) throws JsonProcessingException {
-
         TodayOutfitDTO result = new TodayOutfitDTO();
-//        List<UserMatchDTO> matches = new ArrayList<>();
 
         // 0. Mock - get user wardrobe
-
-        List<GarmentDAO> allGarmets = userWardrobeRepository.findAll();
-//        Resource fileResource = resourceLoader.getResource("classpath:mockup/mockWardrobe.json");
-//        Wardrobe wardrobe = wardrobeRepository.retrieveWardRobe();
-//        Wardrobe  wardrobe = new Wardrobe();
-//        List<Garment> garmentList = Arrays.asList((Garment[]) convertJsonFileIntoObject(fileResource.getInputStream(), Garment[].class));
-//        wardrobe.setGarments(garmentList);
+        log.debug("parameters {}", parameters);
+        List<GarmentDAO> allGarments = userWardrobeRepository.findGarmentsByUserId(parameters.get(USER_ID).toString());
+        log.debug("allGarments: {}", allGarments);
 
         // 1. Get suggestions from OpenAI
         AiResponse createChatCompletionResponse = chatCompletionClient
-                .createTodayOutfit(parameters, allGarmets, Outfit.class);
+                .suggestOutfit(parameters, allGarments, Outfit.class);
         String jsonStringResponse = createChatCompletionResponse.getGeneration().getText();
         log.debug("jsonStringResponse {}", jsonStringResponse);
         Outfit outfit = convertJsonIntoOutfit(jsonStringResponse);
-
-//        UserMatchDTOMapper userMatchDTOMapper =
-//                applicationContext.getBean(UserMatchDTOMapper.class);
 
         List<GarmentDTO> garmentList = new ArrayList<>();
 
         // 2. For each suggestion -> find nearest with wardrobe
         for(Garment garment : outfit.getMatches()){
 
-            List<Document> retrievedDocuments = new VectorStoreRetriever(wardrobeVectoreStore, 10).retrieve(garment.toString());
+            List<Document> retrievedDocuments = new VectorStoreRetriever(wardrobeVectorStoreBuilder.getWardrobeVectorStore(), 5).retrieve(garment.toString());
 
             for(Document document : retrievedDocuments){
                 Match match = objectMapper.readValue(document.getContent(), Match.class);
-                if(match.getCategory().equals(garment.getCategory())){
-                    GarmentDAO garmentDao = userWardrobeRepository.findByGarmentId(document.getMetadata().get("garmentId").toString());
+                if(match != null && match.getCategory() != null && match.getCategory().equalsIgnoreCase(garment.getCategory())){
+                    GarmentDAO garmentDao = userWardrobeRepository.findByGarmentId(document.getId());
                     garmentList.add(garmentDTOMapper.daoToDto(garmentDao));
+                    break;
                 }
             }
-
-
-////            Match match = knnClient.getNearestOutfit(garment, garmentWeight, wardrobeTempFile);
-//            UserMatchDTO userMatchDTO = userMatchDTOMapper.modelToDTO(match);
-//            matches.add(userMatchDTO);
 
         }
 
         // 3. Return outfit matches
-        result.setLayout(LayoutEnum.valueOf(parameters.get("layout").toString()));
-        result.setGarmentList(garmentList);
+        result.setLayout(LayoutEnum.valueOf(parameters.get(LAYOUT).toString()));
+        List<GarmentDTO> filteredGarmentList = garmentList
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        // 4. Understand which garment weren't found from wardrobe
+        outfit.getMatches().forEach(match -> {
+
+            try {
+
+                String categoryMatch = match.getCategory().toUpperCase();
+                CategoryEnum categoryEnum = CategoryEnum.valueOf(categoryMatch);
+                if(categoryMatch != null) {
+
+                    List<GarmentDTO> garmentDTOList = filteredGarmentList
+                            .stream()
+                            .filter(garmentDTO -> garmentDTO.getCategory().getValue().equalsIgnoreCase(categoryMatch))
+                            .toList();
+
+                    if(garmentDTOList.isEmpty()){
+                        GarmentDTO emptyGarmentPlaceholder = new GarmentDTO();
+                        emptyGarmentPlaceholder.setCategory(categoryEnum);
+                        if(categoryEnum != null && externalStoreMap.containsKey(categoryEnum)){
+
+                            String externalUrl = externalStoreMap.get(categoryEnum);
+                            emptyGarmentPlaceholder.setExternalStoreUrl(externalUrl);
+
+                        }
+                        filteredGarmentList.add(emptyGarmentPlaceholder);
+                    }
+
+                }
+
+            } catch (Exception e) {
+
+                log.error(e.getMessage(), e);
+
+            }
+
+        });
+
+        result.setGarmentList(filteredGarmentList);
         return result;
+    }
 
+    public BasicOutfitDTO promptedOutfit(Map<String, Object> parameters){
+        BasicOutfitDTO result = new BasicOutfitDTO();
+//        List<UserMatchDTO> matches = new ArrayList<>();
 
+        // 0. Mock - get user wardrobe
+
+        List<GarmentDAO> allGarments = userWardrobeRepository.findGarmentsByUserId(parameters.get("userId").toString());
+        log.debug("allGarments: {}", allGarments);
+
+        AiResponse createChatCompletionResponse = chatCompletionClient
+                .suggestOutfit(parameters, allGarments, Outfit.class);
+        return null;
     }
 }

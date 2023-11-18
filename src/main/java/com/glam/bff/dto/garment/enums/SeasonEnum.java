@@ -10,7 +10,9 @@ public enum SeasonEnum {
   SPRING("Spring"),
   SUMMER("Summer"),
   FALL("Fall"),
-  WINTER("Winter");
+  WINTER("Winter"),
+  DONT_KNOW("I-Dont-Know"),
+  ALL("All");
 
   private final String value;
 

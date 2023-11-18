@@ -27,7 +27,7 @@ public class JsonUtils {
 
             ObjectMapper mapper = new ObjectMapper();
             Outfit outfit;
-            outfit = mapper.readValue(jsonString, Outfit.class);
+            outfit = mapper.readValue(sanitizeString(jsonString), Outfit.class);
 
             return outfit;
 
@@ -47,6 +47,12 @@ public class JsonUtils {
             return null;
         }
 
+    }
+
+    private static String sanitizeString(String jsonString){
+        jsonString = jsonString.replace("```", "");
+        jsonString = jsonString.replace("json", "");
+        return jsonString.replace("```", "");
     }
 
 }

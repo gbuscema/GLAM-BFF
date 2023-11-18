@@ -2,6 +2,9 @@ package com.glam.bff.dto.garment.enums;
 
 import java.util.List;
 
+import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.netlib.util.floatW;
+
 public enum SubCategoryEnum {
 
   // CAPS
@@ -10,6 +13,7 @@ public enum SubCategoryEnum {
   WIDE_BRIMMED_HAT("WIDE-Brimmed-Hat", CategoryEnum.CAPS),
   FEDORA("Fedora", CategoryEnum.CAPS),
   PEAKY_BLINDERS("Peaky-Blinders", CategoryEnum.CAPS),
+  HATS("Hats", CategoryEnum.CAPS),
 
   // TOPS
   T_SHIRT("T-Shirt", CategoryEnum.TOPS),
@@ -19,6 +23,7 @@ public enum SubCategoryEnum {
   POLO("Polo", CategoryEnum.TOPS),
   TUNIC("Tunic", CategoryEnum.TOPS),
   SWEATER("Sweater", CategoryEnum.TOPS),
+  JACKET("Jacket", CategoryEnum.TOPS),
 
   // BOTTOMS
   JEANS("Jeans", CategoryEnum.BOTTOM),
@@ -40,7 +45,13 @@ public enum SubCategoryEnum {
   HIGH_WEEL("High-Weel", CategoryEnum.SHOES),
   SANDALS("Sandals", CategoryEnum.SHOES),
   LOAFERS("Loafers", CategoryEnum.SHOES),
-  WEDGES("Wedges", CategoryEnum.SHOES);
+  WEDGES("Wedges", CategoryEnum.SHOES),
+
+  // ACCESSORIES
+  BELT("Belt", CategoryEnum.ACCESSORIES),
+  ACCESSORIES("Accessories", CategoryEnum.ACCESSORIES),
+  SCARVES("Scarves", CategoryEnum.ACCESSORIES),
+  JEWELRY("Jewelry", CategoryEnum.ACCESSORIES);
 
   private final String value;
   private final CategoryEnum category;
@@ -59,13 +70,24 @@ public enum SubCategoryEnum {
   }
 
   public static SubCategoryEnum searchMatch(String valueToMatch) {
+    var stringComparer = new LevenshteinDistance();
     var values = List.of(SubCategoryEnum.values());
     var normalizedValueToMatch = valueToMatch.toLowerCase();
     SubCategoryEnum mappedValue = null;
+    var minDistance = Float.MAX_VALUE;
     for (SubCategoryEnum value : values) {
-      if (value.value.toLowerCase().equals(normalizedValueToMatch))
+      var distance = stringComparer.apply(value.value.toLowerCase(), normalizedValueToMatch);
+
+      if (distance < minDistance) {
+        minDistance = distance;
         mappedValue = value;
+      }
+      // if (value.value.toLowerCase().contains(normalizedValueToMatch))
+      // mappedValue = value;
     }
-    return mappedValue;
+    System.out.println(valueToMatch);
+    System.out.println(minDistance);
+    System.out.println(mappedValue.value);
+    return minDistance < 2 ? mappedValue : null;
   }
 }

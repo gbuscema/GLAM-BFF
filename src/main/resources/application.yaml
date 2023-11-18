@@ -8,8 +8,8 @@ spring:
       uri: "mongodb://root:Glam2023!@localhost:27017/mongodb?authSource=admin"
   ai:
     openai:
-      model: "gpt-3.5-turbo"
-      apiKey: "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"
+      model: "gpt-4-1106-preview"
+      apiKey: "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"
   jackson:
     default-property-inclusion: NON_NULL
   datasource:

@@ -111,4 +111,19 @@ public class OutfitService {
         return outfitDTOMapper.daoToDto(outfitDAO);
 
     }
+
+    public OutfitDTO updateUserOutfitFavorite(String outfitId, String userId, Boolean isFavorite) throws Exception {
+
+        OutfitDAO outfitDAO = checkOutfitExistance(outfitId, userId);
+
+        outfitDAO.setIsFavorite(isFavorite);
+
+        // update Outfit
+        OutfitDAO savedOutfitDAO = userOutfitRepository.save(outfitDAO);
+
+        // DAO -> DTO
+        OutfitDTOMapper outfitDTOMapper = applicationContext.getBean(OutfitDTOMapper.class);
+        return outfitDTOMapper.daoToDto(savedOutfitDAO);
+
+    }
 }

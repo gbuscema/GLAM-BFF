@@ -1,5 +1,6 @@
 package com.glam.bff.mapper.wardrobe;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.glam.bff.dao.GarmentDAO;
@@ -17,14 +18,13 @@ import org.mapstruct.Mapping;
 public interface GarmentDTOMapper {
 
     @Mapping(target = "photoUri", expression = "java( source.getPhoto() != null ? \"/wardrobes/users/\" + source.getUserId() + \"/garments/photo/\" + source.getPhoto().getPhotoId() : null)")
-    @Mapping(target = "textureUri", source="source.photo.textureUri")
+    @Mapping(target = "textureUri", source = "source.photo.textureUri")
     GarmentDTO daoToDto(GarmentDAO source);
-
 
     GarmentDAO dtoToDao(GarmentDTO source);
 
     @Mapping(target = "photoUri", expression = "java( source.getPhoto() != null ? \"/wardrobes/users/\" + source.getUserId() + \"/garments/photo/\" + source.getPhoto().getPhotoId() : null)")
-    @Mapping(target = "textureUri", source="source.photo.textureUri")
+    @Mapping(target = "textureUri", source = "source.photo.textureUri")
     BasicGarmentDTO basicDaoToDto(GarmentDAO source);
 
     GarmentDAO basicDtoToDao(BasicGarmentDTO source);
@@ -58,8 +58,9 @@ public interface GarmentDTOMapper {
         annotations.forEach((annotation) -> {
             var valueToMatch = annotation.getDescription();
             var subcategory = SubCategoryEnum.searchMatch(valueToMatch);
-            if (subcategory != null) {
+            if (garment.getSubCategory() == null && subcategory != null) {
                 garment.setSubCategory(subcategory);
+                garment.setCategory(subcategory.getCategory());
                 return;
             }
 
@@ -93,9 +94,9 @@ public interface GarmentDTOMapper {
                 return;
             }
 
-            var season = SeasonEnum.searchMatch(valueToMatch);
+            SeasonEnum season = SeasonEnum.searchMatch(valueToMatch);
             if (season != null) {
-                garment.setSeason(season);
+                garment.setSeason(Collections.singletonList(season));
                 return;
             }
 
@@ -115,9 +116,9 @@ public interface GarmentDTOMapper {
                 garment.setFabric(fabric);
                 return;
             }
-            var season = SeasonEnum.searchMatch(valueToMatch);
+            SeasonEnum season = SeasonEnum.searchMatch(valueToMatch);
             if (season != null) {
-                garment.setSeason(season);
+                garment.setSeason(Collections.singletonList(season));
                 return;
             }
 
