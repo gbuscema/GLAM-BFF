@@ -229,6 +229,7 @@ public class WardrobeService {
                 garmentDAO.setUserId(userId);
                 var saved = saveGarment(garmentDAO);
                 log.debug("saved:" + saved.getGarmentId());
+                userWardrobeRepository.save(garmentDAO);
             }
 
         } catch (Exception e) {
