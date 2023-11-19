@@ -5,7 +5,6 @@ import com.glam.userservice.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,9 +20,9 @@ public class AuthenticationService {
     @Autowired
     private UserRepository userRepository;
 
-    public void registerUser(UserDAO userDAO) {
+    public UserDAO registerUser(UserDAO userDAO) {
 
-        userRepository.save(userDAO);
+        return userRepository.save(userDAO);
 
     }
 

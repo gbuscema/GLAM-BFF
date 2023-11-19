@@ -5,8 +5,6 @@ import com.glam.userservice.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.*;
 
 import static com.glam.userservice.utils.Constants.USER_ID;
@@ -24,11 +22,9 @@ public class AuthenticationController {
           summary = "API to register the user in GLAM",
           description =
                   "Used to register the user in GLAM")
-  public HttpStatusCode registerUser(@RequestBody final UserDAO body) throws Exception {
+  public UserDAO registerUser(@RequestBody final UserDAO body) throws Exception {
 
-    authenticationService.registerUser(body);
-
-    return HttpStatusCode.valueOf(200);
+    return authenticationService.registerUser(body);
   }
 
   @PostMapping("/login")
