@@ -20,6 +20,12 @@ spring:
       ddl-auto: update
     defer-datasource-initialization: true
 
+logging:
+  level:
+    root: trace
+    org.springframework.web: trace
+    org.hibernate: error
+
 server:
   port: 8080
 

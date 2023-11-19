@@ -16,8 +16,9 @@ public class GarmentPhotoDAO {
     @Id
     private String photoId;
 
-    @DocumentReference
-    private GarmentDAO garment;
+    /*@DocumentReference
+    private GarmentDAO garment;*/
+    private String garmentId;
 
     private String userId;
 

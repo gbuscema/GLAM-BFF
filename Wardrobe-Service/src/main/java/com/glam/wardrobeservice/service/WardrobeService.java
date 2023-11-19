@@ -159,7 +159,7 @@ public class WardrobeService {
         GarmentDAO savedGarment = userWardrobeRepository.save(garmentDAO);
 
         // update Photo in DB
-        garmentPhotoDAO.setGarment(savedGarment);
+        garmentPhotoDAO.setGarmentId(savedGarment.getGarmentId());
         garmentPhotoRepository.save(garmentPhotoDAO);
 
         return savedGarment;
@@ -314,11 +314,15 @@ public class WardrobeService {
         garmentPhotoRepository.deleteById(garmentPhotoId);
 
         // update garment from DB
-        if (garmentPhotoDAO.getGarment() != null) {
+        if (garmentPhotoDAO.getGarmentId() != null) {
 
-            GarmentDAO garmentDAO = garmentPhotoDAO.getGarment();
-            garmentDAO.setPhoto(null);
-            userWardrobeRepository.save(garmentDAO);
+            String garmentId = garmentPhotoDAO.getGarmentId();
+            Optional<GarmentDAO> optionalGarmentDAO = userWardrobeRepository.findById(garmentId);
+            if(optionalGarmentDAO.isPresent()){
+                GarmentDAO garmentDAO = optionalGarmentDAO.get();
+                garmentDAO.setPhoto(null);
+                userWardrobeRepository.save(garmentDAO);
+            }
 
         }
     }
