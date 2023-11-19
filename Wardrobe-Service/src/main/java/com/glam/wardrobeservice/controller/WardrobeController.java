@@ -117,6 +117,17 @@ public class WardrobeController {
 
         }
 
+        @GetMapping("/users/{userId}/garments/photo/{garmentPhotoId}/info")
+        @Tag(name = "Wardrobe")
+        @Operation(summary = "API to get the user garment's photo information in GLAM", description = "Used to get the garment's photo information")
+        public GarmentPhotoDAO getGarmentPhotoInfo(
+                @PathVariable(USER_ID) final String userId,
+                @PathVariable(GARMENT_PHOTO_ID) final String garmentPhotoId) throws Exception {
+
+                return wardrobeService.getGarmentPhoto(userId, garmentPhotoId);
+
+        }
+
         @GetMapping("/users/{userId}/garments/photo/{garmentPhotoId}")
         @Tag(name = "Wardrobe")
         @Operation(summary = "API to get the user garment's photo in GLAM", description = "Used to get the garment's photo")
