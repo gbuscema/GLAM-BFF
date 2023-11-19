@@ -1,0 +1,127 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://user-service.fly.dev
+    description: Generated server url
+paths:
+  /authentication/users/{userId}:
+    get:
+      tags:
+        - Authentication
+      summary: API to get the user info in GLAM
+      description: Used to get the user info in GLAM
+      operationId: getUserInfo
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDAO'
+    put:
+      tags:
+        - Authentication
+      summary: API to update the user info in GLAM
+      description: Used to update the user info in GLAM
+      operationId: updateUserInfo
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDAO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDAO'
+  /authentication/register:
+    post:
+      tags:
+        - Authentication
+      summary: API to register the user in GLAM
+      description: Used to register the user in GLAM
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDAO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDAO'
+  /authentication/login:
+    post:
+      tags:
+        - Authentication
+      summary: API to login the user in GLAM
+      description: Used to login the user in GLAM
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDAO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDAO'
+components:
+  schemas:
+    UserDAO:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int32
+        email:
+          type: string
+        password:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        gender:
+          type: string
+        locationAgreement:
+          type: boolean
+        fashionCanon:
+          type: integer
+          format: int64
+        styles:
+          type: array
+          items:
+            type: string
+        livingLocation:
+          type: string
+        season:
+          type: array
+          items:
+            type: string

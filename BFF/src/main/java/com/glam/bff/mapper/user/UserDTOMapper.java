@@ -1,12 +1,10 @@
 package com.glam.bff.mapper.user;
 
-import com.glam.bff.dao.UserDAO;
 import com.glam.bff.dto.authentication.UserInfoDTO;
 import com.glam.bff.dto.authentication.UserLoginDTO;
 import com.glam.bff.dto.authentication.UserLoginResponseDTO;
 import com.glam.bff.dto.authentication.UserRegistrationDTO;
-import com.glam.bff.dto.recommendation.UserMatchDTO;
-import com.glam.bff.model.Match;
+import com.glam.bff.openapi.user.model.UserDAO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

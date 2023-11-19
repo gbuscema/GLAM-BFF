@@ -10,8 +10,6 @@ import com.glam.bff.utils.WardrobeVectorStoreBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.*;
 
 import static com.glam.bff.utils.Constants.USER_ID;
@@ -35,11 +33,10 @@ public class AuthenticationController {
           summary = "API to register the user in GLAM",
           description =
                   "Used to register the user in GLAM")
-  public HttpStatusCode registerUser(@RequestBody final UserRegistrationDTO body) throws Exception {
+  public UserLoginResponseDTO registerUser(@RequestBody final UserRegistrationDTO body) throws Exception {
 
-    authenticationService.registerUser(body);
+    return authenticationService.registerUser(body);
 
-    return HttpStatus.OK;
   }
 
   @PostMapping("/login")

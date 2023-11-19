@@ -8,12 +8,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@EnableJpaRepositories("com.glam.bff.*")
 @EnableConfigurationProperties
 @ComponentScan(basePackages = { "com.glam.bff.*" })
-@EntityScan(basePackages = {"com.glam.bff.dao"})
 @SpringBootApplication(scanBasePackages = "com.glam.bff", exclude = {LiquibaseAutoConfiguration.class})//, SecurityAutoConfiguration.class})
 public class GlamBffApplication {
 
