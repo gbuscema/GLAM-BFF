@@ -88,24 +88,6 @@ public class WardrobeService {
 
         // convert multipart into byte[]
         byte[] byteArr = photo.getBytes();
-        // InputStream inputStream = new ByteArrayInputStream(byteArr);
-        ByteArrayInputStream bais = new ByteArrayInputStream(byteArr);
-        BufferedImage image = ImageIO.read(bais);
-        File outputFile = new File("input-temp.png");
-        ImageIO.write(image, "png", outputFile);
-        String pythonScriptPath = "src/main/resources/python/BackgroundRemover.py";
-        String arg1 = "input-temp.png";
-        String arg2 = "out-temp.png";
-
-        ProcessBuilder processBuilder = new ProcessBuilder("python3", pythonScriptPath, arg1, arg2);
-        processBuilder.inheritIO();
-        Process process = processBuilder.start();
-        // process.getErrorStream().transferTo(System.err);
-        // process.getInputStream().transferTo(System.out);
-        process.waitFor();
-        try (InputStream inputStream = new FileInputStream("out-temp.png")) {
-            byteArr = inputStream.readAllBytes();
-        }
 
         // Save Photo in DB
         GarmentPhotoDAO garmentPhotoDAO = new GarmentPhotoDAO(
@@ -286,7 +268,7 @@ public class WardrobeService {
         garmentDAO.setGarmentId(garmentId);
         garmentDAO.setUserId(userId);
 
-        Optional<GarmentDAO> existingDAO = userWardrobeRepository.findById(garmentId);
+        /*Optional<GarmentDAO> existingDAO = userWardrobeRepository.findById(garmentId);
         existingDAO.ifPresent(dao -> {
             garmentDAO.setPhoto(dao.getPhoto());
             garmentDAO.setCategory(dao.getCategory());
@@ -300,7 +282,7 @@ public class WardrobeService {
             garmentDAO.setSeason(dao.getSeason());
             garmentDAO.setStyles(dao.getStyles());
             garmentDAO.setFabric(dao.getFabric());
-        });
+        });*/
 
         return updateGarment(garmentDAO);
 
