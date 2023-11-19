@@ -43,3 +43,5 @@ service:
     services:
       user:
         endpoint: "https://user-service.fly.dev"
+      wardrobe:
+        endpoint: "https://wardrobe-service.fly.dev"

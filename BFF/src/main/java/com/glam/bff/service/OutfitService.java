@@ -1,10 +1,11 @@
 package com.glam.bff.service;
 
-import com.glam.bff.dao.OutfitDAO;
+import com.glam.bff.client.wardrobe.OutfitClient;
+import com.glam.bff.client.wardrobe.WardrobeClient;
 import com.glam.bff.dto.outfit.BasicOutfitDTO;
 import com.glam.bff.dto.outfit.OutfitDTO;
 import com.glam.bff.mapper.outfit.OutfitDTOMapper;
-import com.glam.bff.repository.UserOutfitRepository;
+import com.glam.bff.openapi.wardrobe.model.OutfitDAO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -21,12 +22,14 @@ public class OutfitService {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private UserOutfitRepository userOutfitRepository;
+    private WardrobeClient wardrobeClient;
+    @Autowired
+    private OutfitClient outfitClient;
 
     public List<OutfitDTO> getUserOutfits(String userId) {
 
         // get outfits from DB per userId
-        List<OutfitDAO> outfitDAOList = userOutfitRepository.findOutfitsByUserId(userId);
+        List<OutfitDAO> outfitDAOList = outfitClient.getUserOutfits(userId);
 
         // DAO -> DTO
         OutfitDTOMapper outfitDTOMapper = applicationContext.getBean(OutfitDTOMapper.class);
@@ -45,66 +48,34 @@ public class OutfitService {
         outfitDAO.setUserId(userId);
 
         // save user outfit inside DB
-        OutfitDAO savedOutfitDAO = userOutfitRepository.save(outfitDAO);
+        OutfitDAO savedOutfitDAO = outfitClient.saveUserOutfit(userId, outfitDAO);
 
-        // get outfit from DB
-        OutfitDAO outfitDAOFromDB = userOutfitRepository.findById(savedOutfitDAO.getOutfitId()).get();
-        return outfitDTOMapper.daoToDto(outfitDAOFromDB);
+        return outfitDTOMapper.daoToDto(savedOutfitDAO);
 
     }
 
     public void deleteUserOutfit(String outfitId, String userId) throws Exception {
 
-        checkOutfitExistance(outfitId, userId);
-
-        userOutfitRepository.deleteById(outfitId);
+        outfitClient.deleteUserOutfit(outfitId, userId);
 
     }
 
     public OutfitDTO updateUserOutfit(String outfitId, String userId, BasicOutfitDTO outfitDTO) throws Exception {
 
-        checkOutfitExistance(outfitId, userId);
-
         // DTO -> DAO
         OutfitDTOMapper outfitDTOMapper = applicationContext.getBean(OutfitDTOMapper.class);
         OutfitDAO newOutfitDAO = outfitDTOMapper.basicDtoToDao(outfitDTO);
-        newOutfitDAO.setOutfitId(outfitId);
-        newOutfitDAO.setUserId(userId);
 
-        OutfitDAO outfitDAO = userOutfitRepository.save(newOutfitDAO);
+        OutfitDAO updatedOutfitDAO = outfitClient.updateUserOutfit(outfitId, userId, newOutfitDAO);
 
-        // get outfit from DB
-        OutfitDAO savedOutfitDAO = userOutfitRepository.findById(outfitDAO.getOutfitId()).get();
-        return outfitDTOMapper.daoToDto(savedOutfitDAO);
-
-    }
-
-    /////////////////////
-    // PRIVATE METHODS //
-    /////////////////////
-
-    private OutfitDAO checkOutfitExistance (String outfitId, String userId) throws Exception {
-
-        // get outfit from DB
-        Optional<OutfitDAO> optionalOutfitDAO = userOutfitRepository.findById(outfitId);
-
-        if(!optionalOutfitDAO.isPresent()){
-            throw new Exception("No outfit present with ID: " + outfitId);
-        }
-
-        OutfitDAO outfitDAO = optionalOutfitDAO.get();
-
-        if(!outfitDAO.getUserId().equalsIgnoreCase(userId)) {
-            throw new Exception("No outfit present with ID: " + outfitId + " for user: " + userId);
-        }
-
-        return outfitDAO;
+        // DAO -> DTO
+        return outfitDTOMapper.daoToDto(updatedOutfitDAO);
 
     }
 
     public OutfitDTO getUserOutfit(String outfitId, String userId) throws Exception {
 
-        OutfitDAO outfitDAO = checkOutfitExistance(outfitId, userId);
+        OutfitDAO outfitDAO = outfitClient.getUserOutfit(outfitId, userId);
 
         // DTO -> DAO
         OutfitDTOMapper outfitDTOMapper = applicationContext.getBean(OutfitDTOMapper.class);
@@ -114,16 +85,11 @@ public class OutfitService {
 
     public OutfitDTO updateUserOutfitFavorite(String outfitId, String userId, Boolean isFavorite) throws Exception {
 
-        OutfitDAO outfitDAO = checkOutfitExistance(outfitId, userId);
-
-        outfitDAO.setIsFavorite(isFavorite);
-
-        // update Outfit
-        OutfitDAO savedOutfitDAO = userOutfitRepository.save(outfitDAO);
+        OutfitDAO outfitDAO = outfitClient.updateUserOutfitFavorite(outfitId, userId, isFavorite);
 
         // DAO -> DTO
         OutfitDTOMapper outfitDTOMapper = applicationContext.getBean(OutfitDTOMapper.class);
-        return outfitDTOMapper.daoToDto(savedOutfitDAO);
+        return outfitDTOMapper.daoToDto(outfitDAO);
 
     }
 }

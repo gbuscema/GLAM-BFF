@@ -191,6 +191,11 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.15.0</version>
+        </dependency>
         <!-- Utils dependencies END -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -256,6 +261,30 @@
                             <library>resttemplate</library>
                             <apiPackage>com.glam.bff.openapi.user.api</apiPackage>
                             <modelPackage>com.glam.bff.openapi.user.model</modelPackage>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <skipValidateSpec>true</skipValidateSpec>
+                            <configOptions>
+                                <generateClientAsBean>true</generateClientAsBean>
+                                <openApiNullable>false</openApiNullable>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>execution-glam-wardrobe-swagger</id>
+                        <!--
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        -->
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/swagger/wardrobeSwagger.yaml</inputSpec>
+                            <generatorName>java</generatorName>
+                            <library>resttemplate</library>
+                            <apiPackage>com.glam.bff.openapi.wardrobe.api</apiPackage>
+                            <modelPackage>com.glam.bff.openapi.wardrobe.model</modelPackage>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateModelDocumentation>false</generateModelDocumentation>

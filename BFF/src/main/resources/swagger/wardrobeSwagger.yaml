@@ -1,0 +1,611 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /wardrobes/users/{userId}/garments/{garmentId}:
+    get:
+      tags:
+        - Wardrobe
+      summary: API to get the user garment in GLAM
+      description: Used to get the garment and its photo
+      operationId: getUserGarment
+      parameters:
+        - name: garmentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GarmentDAO'
+    put:
+      tags:
+        - Wardrobe
+      summary: API to update the user garment in GLAM
+      description: Used to update the garment
+      operationId: updateUserGarment
+      parameters:
+        - name: garmentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GarmentDAO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GarmentDAO'
+    delete:
+      tags:
+        - Wardrobe
+      summary: API to delete the user garment in GLAM
+      description: Used to delete the garment and its photo
+      operationId: deleteUserGarment
+      parameters:
+        - name: garmentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /wardrobes/users/{userId}/garments/photo/{garmentPhotoId}:
+    get:
+      tags:
+        - Wardrobe
+      summary: API to get the user garment's photo in GLAM
+      description: Used to get the garment's photo
+      operationId: getGarmentPhoto
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: garmentPhotoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: byte
+    put:
+      tags:
+        - Wardrobe
+      summary: API to update an user garment's photo in GLAM
+      description: Used to update the garment's photo and retrieve the list of properties for the garment
+      operationId: updateUserGarmentPhoto
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: garmentPhotoId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarmentDAO'
+    delete:
+      tags:
+        - Wardrobe
+      summary: API to delete the user garment'photo in GLAM
+      description: Used to delete the garment's photo
+      operationId: deleteUserGarmentPhoto
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: garmentPhotoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /outfits/{outfitId}/users/{userId}:
+    get:
+      tags:
+        - Outfit
+      summary: API to get the user's outfit in GLAM
+      description: Used to get the user's outfit
+      operationId: getUserOutfit
+      parameters:
+        - name: outfitId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OutfitDAO'
+    put:
+      tags:
+        - Outfit
+      summary: API to update the user's outfit in GLAM
+      description: Used to update the user's outfit
+      operationId: updateUserOutfit
+      parameters:
+        - name: outfitId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutfitDAO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OutfitDAO'
+    delete:
+      tags:
+        - Outfit
+      summary: API to delete the user's outfit in GLAM
+      description: Used to delete the user's outfit
+      operationId: deleteUserOutfit
+      parameters:
+        - name: outfitId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /outfits/{outfitId}/users/{userId}/favorite:
+    put:
+      tags:
+        - Outfit
+      summary: API to set the outfit's favorite setting in GLAM
+      description: Used to set the outfit's favorite setting
+      operationId: updateUserOutfitFavorite
+      parameters:
+        - name: outfitId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: isFavorite
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OutfitDAO'
+  /wardrobes/users/{userId}/overwrite:
+    post:
+      tags:
+        - Wardrobe
+      summary: API to save the user's wardrobe in GLAM
+      description: Used to save the garment list inside the user's wardrobe
+      operationId: saveUserWardrobe
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/GarmentDAO'
+        required: true
+      responses:
+        '200':
+          description: OK
+  /wardrobes/users/{userId}/garments/save:
+    post:
+      tags:
+        - Wardrobe
+      summary: API to save an user's garment information in GLAM
+      description: Used to save the garment's information
+      operationId: addUserGarmentInWardrobe
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GarmentDAO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GarmentDAO'
+  /wardrobes/users/{userId}/garments/photo/save:
+    post:
+      tags:
+        - Wardrobe
+      summary: API to save an user garment's photo in GLAM
+      description: Used to save the garment's photo and retrieve the list of properties for the garment
+      operationId: saveUserGarmentPhoto
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarmentDAO'
+  /wardrobes/users/{userId}/garments/mock:
+    post:
+      tags:
+        - WardrobeDbCreation
+      summary: API that populates the database with mock data
+      operationId: uploadMockGarments
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /wardrobes/users/{userId}/garments/complete/save:
+    post:
+      tags:
+        - Wardrobe
+      summary: API to completely save an user's garment in GLAM
+      description: Used to save the garment together with its photo
+      operationId: saveUserGarmentInWardrobeComplete
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: garment
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GarmentDAO'
+  /outfits/users/{userId}/save:
+    post:
+      tags:
+        - Outfit
+      summary: API to save the user outfit in GLAM
+      description: Used to save the user's outfit
+      operationId: saveUserOutfit
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutfitDAO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OutfitDAO'
+  /wardrobes/users/{userId}:
+    get:
+      tags:
+        - Wardrobe
+      summary: API to get the user's wardrobe in GLAM
+      description: Used to get the garment list inside the user's wardrobe
+      operationId: getUserWardrobe
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GarmentDAO'
+  /wardrobes/users/{userId}/garments/photo/{garmentPhotoId}/info:
+    get:
+      tags:
+        - Wardrobe
+      summary: API to get the user garment's photo information in GLAM
+      description: Used to get the garment's photo information
+      operationId: getGarmentPhotoInfo
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: garmentPhotoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GarmentPhotoDAO'
+  /wardrobes/users/{userId}/categories/{category}:
+    get:
+      tags:
+        - Wardrobe
+      summary: API to get the user's categories garments in GLAM
+      description: Used to get the garment list inside the user's wardrobe by CATEGORY
+      operationId: getUserWardrobeCategoriesGarments
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: category
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - CAPS
+              - TOPS
+              - BOTTOM
+              - ONE_PIECE
+              - ACCESSORIES
+              - SHOES
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GarmentDAO'
+  /outfits/users/{userId}:
+    get:
+      tags:
+        - Outfit
+      summary: API to get the user outfits in GLAM
+      description: Used to get the user's outfits
+      operationId: getUserOutfits
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OutfitDAO'
+components:
+  schemas:
+    GarmentDAO:
+      type: object
+      properties:
+        garmentId:
+          type: string
+        photo:
+          $ref: '#/components/schemas/GarmentPhotoDAO'
+        userId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        subCategory:
+          type: string
+        mainColor:
+          type: string
+        secondColor:
+          type: string
+        pattern:
+          type: string
+        brand:
+          type: string
+        isFavorite:
+          type: boolean
+        fabric:
+          type: string
+        condition:
+          type: string
+        sleeveLength:
+          type: string
+        length:
+          type: string
+        sizeEnum:
+          type: string
+        patternDetail:
+          type: string
+        season:
+          type: array
+          items:
+            type: string
+        styles:
+          type: array
+          items:
+            type: string
+        photoUri:
+          type: string
+    GarmentPhotoDAO:
+      type: object
+      properties:
+        photoId:
+          type: string
+        garmentId:
+          type: string
+        userId:
+          type: string
+        fileName:
+          type: string
+        photo:
+          type: string
+          format: byte
+        textureUri:
+          type: string
+    OutfitDAO:
+      type: object
+      properties:
+        outfitId:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        layout:
+          type: string
+        isFavorite:
+          type: boolean
+        garmentList:
+          type: array
+          items:
+            $ref: '#/components/schemas/GarmentDAO'

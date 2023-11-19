@@ -3,12 +3,11 @@ package com.glam.bff.mapper.wardrobe;
 import java.util.Collections;
 import java.util.List;
 
-import com.glam.bff.dao.GarmentDAO;
 import com.glam.bff.dto.garment.BasicGarmentDTO;
 import com.glam.bff.dto.garment.GarmentDTO;
-import com.glam.bff.model.Match;
 
 import com.glam.bff.dto.garment.enums.*;
+import com.glam.bff.openapi.wardrobe.model.GarmentDAO;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
 
 import org.mapstruct.Mapper;
@@ -28,10 +27,6 @@ public interface GarmentDTOMapper {
     BasicGarmentDTO basicDaoToDto(GarmentDAO source);
 
     GarmentDAO basicDtoToDao(BasicGarmentDTO source);
-
-    List<Match> garmentsDaoToMatch(List<GarmentDAO> source);
-
-    Match garmentDaoToMatch(GarmentDAO source);
 
     GarmentDTO basicDTOtoDTO(BasicGarmentDTO source);
 

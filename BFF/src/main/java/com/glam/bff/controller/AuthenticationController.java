@@ -5,8 +5,6 @@ import com.glam.bff.dto.authentication.UserLoginDTO;
 import com.glam.bff.dto.authentication.UserLoginResponseDTO;
 import com.glam.bff.dto.authentication.UserRegistrationDTO;
 import com.glam.bff.service.AuthenticationService;
-import com.glam.bff.utils.UserContext;
-import com.glam.bff.utils.WardrobeVectorStoreBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +17,7 @@ import static com.glam.bff.utils.Constants.USER_ID;
 public class AuthenticationController {
 
   @Autowired
-  private UserContext userContext;
-
-  @Autowired
   private AuthenticationService authenticationService;
-
-  @Autowired
-  private WardrobeVectorStoreBuilder wardrobeVectorStoreBuilder;
 
   @PostMapping("/register")
   @Tag(name = "Authentication")

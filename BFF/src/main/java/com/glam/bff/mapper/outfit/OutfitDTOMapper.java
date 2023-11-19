@@ -1,9 +1,9 @@
 package com.glam.bff.mapper.outfit;
 
-import com.glam.bff.dao.OutfitDAO;
 import com.glam.bff.dto.outfit.BasicOutfitDTO;
 import com.glam.bff.dto.outfit.OutfitDTO;
 import com.glam.bff.mapper.wardrobe.GarmentDTOMapper;
+import com.glam.bff.openapi.wardrobe.model.OutfitDAO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", uses = {GarmentDTOMapper.class})

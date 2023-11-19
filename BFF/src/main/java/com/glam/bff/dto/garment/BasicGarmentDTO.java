@@ -31,12 +31,8 @@ public class BasicGarmentDTO {
 
     private SubCategoryEnum subCategory;
 
-    @JsonSerialize(using = ColorSerializer.class)
-    @JsonDeserialize(using = ColorDeserializer.class)
     private ColorEnum mainColor;
 
-    @JsonSerialize(using = ColorSerializer.class)
-    @JsonDeserialize(using = ColorDeserializer.class)
     private ColorEnum secondColor;
 
     private PatternEnum pattern;

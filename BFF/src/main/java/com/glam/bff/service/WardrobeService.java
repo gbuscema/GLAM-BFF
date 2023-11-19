@@ -1,21 +1,15 @@
 package com.glam.bff.service;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Optional;
 
-import javax.imageio.ImageIO;
-
+import com.glam.bff.client.wardrobe.MockClient;
+import com.glam.bff.client.wardrobe.WardrobeClient;
+import com.glam.bff.dto.garment.enums.CategoryEnum;
 import com.glam.bff.dto.polycam.StableDiffusionResponseDTO;
-import com.glam.bff.threads.AnalyzeImageThread;
-import com.glam.bff.threads.UploadImageThread;
-import com.google.cloud.vision.v1.AnnotateImageResponse;
-import com.google.cloud.vision.v1.Feature;
+import com.glam.bff.openapi.wardrobe.model.GarmentDAO;
+import com.glam.bff.openapi.wardrobe.model.GarmentPhotoDAO;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,50 +17,22 @@ import org.springframework.web.client.RestTemplate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.glam.bff.client.polycam.PolycamClient;
-import com.glam.bff.dao.GarmentDAO;
-import com.glam.bff.dao.GarmentPhotoDAO;
 import com.glam.bff.dto.garment.BasicGarmentDTO;
 import com.glam.bff.dto.garment.GarmentDTO;
 import com.glam.bff.dto.garment.GarmentPhotoDTO;
-import com.glam.bff.dto.garment.enums.CategoryEnum;
-import com.glam.bff.dto.polycam.ResponseDTO;
 import com.glam.bff.dto.wardrobe.WardrobeDTO;
 import com.glam.bff.mapper.wardrobe.GarmentDTOMapper;
 import com.glam.bff.mapper.wardrobe.GarmentPhotoDTOMapper;
-import com.glam.bff.repository.GarmentPhotoRepository;
-import com.glam.bff.repository.SubcategoryRepository;
-import com.glam.bff.repository.UserWardrobeRepository;
-import com.glam.bff.utils.WardrobeVectorStoreBuilder;
 import com.glam.bff.validators.MultipartPhoto;
 import com.google.cloud.spring.vision.CloudVisionTemplate;
-import com.google.cloud.vision.v1.Feature.Type;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -74,35 +40,44 @@ import java.util.Optional;
 public class WardrobeService {
 
     @Autowired
-    private UserWardrobeRepository userWardrobeRepository;
+    private WardrobeClient wardrobeClient;
     @Autowired
-    private GarmentPhotoRepository garmentPhotoRepository;
+    private MockClient mockClient;
 
-    @Autowired
-    private WardrobeVectorStoreBuilder wardrobeVectorStoreBuilder;
     @Autowired
     private CloudVisionTemplate cloudVisionTemplate;
 
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Autowired
-    private SubcategoryRepository subcategoryRepository;
 
     /////////////////////
     // PRIVATE METHODS //
     /////////////////////
 
+    private GarmentDAO saveGarment(String userId, GarmentDAO garmentDAO) {
+
+        // TODO generate season and styles from OpenAI
+        // TODO implement vectorDB save
+        return wardrobeClient.addUserGarmentInWardrobe(userId, garmentDAO);
+
+    }
+
+    private void deleteGarment(String userId, String garmentId) {
+        // delete the garment
+        wardrobeClient.deleteUserGarment(garmentId, userId);
+
+        // TODO implement delete on vector DB
+    }
+
     private GarmentDAO checkGarmentExistance(String garmentId, String userId) throws Exception {
 
         // get garment from DB
-        Optional<GarmentDAO> optionalGarmentDAO = userWardrobeRepository.findById(garmentId);
+        GarmentDAO garmentDAO = wardrobeClient.getUserGarment(garmentId, userId);
 
-        if (!optionalGarmentDAO.isPresent()) {
+        if (garmentDAO == null) {
             throw new Exception("No garment present with ID: " + garmentId);
         }
-
-        GarmentDAO garmentDAO = optionalGarmentDAO.get();
 
         if (!garmentDAO.getUserId().equalsIgnoreCase(userId)) {
             throw new Exception("No garment present with ID: " + garmentId + " for user: " + userId);
@@ -112,99 +87,35 @@ public class WardrobeService {
 
     }
 
-    private GarmentPhotoDAO checkGarmentPhotoExistance(String userId, String garmentPhotoId) throws Exception {
-
-        // get garment from DB
-        Optional<GarmentPhotoDAO> optionalGarmentPhotoDAO = garmentPhotoRepository.findById(garmentPhotoId);
-
-        if (!optionalGarmentPhotoDAO.isPresent()) {
-            throw new Exception("No garment photo present with ID: " + garmentPhotoId);
-        }
-
-        GarmentPhotoDAO garmentPhotoDAO = optionalGarmentPhotoDAO.get();
-
-        if (!garmentPhotoDAO.getUserId().equalsIgnoreCase(userId)) {
-            throw new Exception("No garment photo present with ID: " + garmentPhotoId + " for user: " + userId);
-        }
-
-        return garmentPhotoDAO;
-
-    }
-
     private BasicGarmentDTO saveGarmentPhoto(String userId, String userGarmentPhotoId, MultipartFile photo)
             throws IOException, InterruptedException {
 
-        // convert multipart into byte[]
-        byte[] byteArr = photo.getBytes();
-        // InputStream inputStream = new ByteArrayInputStream(byteArr);
-        ByteArrayInputStream bais = new ByteArrayInputStream(byteArr);
-        BufferedImage image = ImageIO.read(bais);
-        File outputFile = new File("input-temp.png");
-        ImageIO.write(image, "png", outputFile);
-        String pythonScriptPath = "src/main/resources/python/BackgroundRemover.py";
-        String arg1 = "input-temp.png";
-        String arg2 = "out-temp.png";
-
-        ProcessBuilder processBuilder = new ProcessBuilder("python3", pythonScriptPath, arg1, arg2);
-        processBuilder.inheritIO();
-        Process process = processBuilder.start();
-        // process.getErrorStream().transferTo(System.err);
-        // process.getInputStream().transferTo(System.out);
-        process.waitFor();
-        try (InputStream inputStream = new FileInputStream("out-temp.png")) {
-            byteArr = inputStream.readAllBytes();
-        }
+        File convFile = new File(System.getProperty("java.io.tmpdir")+"/" + photo.getOriginalFilename());
+        photo.transferTo(convFile);
 
         // Save Photo in DB
-        GarmentPhotoDAO garmentPhotoDAO = new GarmentPhotoDAO(
-                userGarmentPhotoId,
-                null,
-                userId,
-                photo.getOriginalFilename(),
-                byteArr,
-                null);
-        GarmentPhotoDAO savedGarmentPhotoDAO = garmentPhotoRepository.save(garmentPhotoDAO);
-
-        GarmentDAO garmentDAO = new GarmentDAO();
-        garmentDAO.setUserId(userId);
-        garmentDAO.setPhoto(savedGarmentPhotoDAO);
-
-        // Resource resource = new ByteArrayResource(byteArr);
-
-        // Generate Texture
-        UploadImageThread uploadImageThread = new UploadImageThread(this);
-        Thread uploadImageT = new Thread(uploadImageThread);
-
-        // Vision API call
-        AnalyzeImageThread analyzeImageThread = new AnalyzeImageThread(cloudVisionTemplate, photo.getResource());
-        Thread analyzeImageT = new Thread(analyzeImageThread);
-
-        uploadImageT.start();
-        analyzeImageT.start();
-        uploadImageT.join();
-        analyzeImageT.join();
-
-        AnnotateImageResponse visionApiResponse = analyzeImageThread.getValue();
-        log.debug(visionApiResponse.getLabelAnnotationsList().toString());
-
-        // Mapping DAO -> DTO
-        GarmentDTOMapper garmentDTOMapper = applicationContext.getBean(GarmentDTOMapper.class);
-        BasicGarmentDTO result = garmentDTOMapper.visionApiToBasicDto(visionApiResponse);
-
-        String textureUrl = uploadImageThread.getTextureUrl();
-        result.setTextureUri(textureUrl);
-
-        if (savedGarmentPhotoDAO != null) {
-            result.setPhotoUri("/wardrobes/users/" + savedGarmentPhotoDAO.getUserId() + "/garments/photo/"
-                    + savedGarmentPhotoDAO.getPhotoId());
+        GarmentDAO garmentDAO = null;
+        if(userGarmentPhotoId == null){
+            garmentDAO = wardrobeClient.saveUserGarmentPhoto(userId, convFile);
+        } else {
+            garmentDAO = wardrobeClient.updateUserGarmentPhoto(userId, userGarmentPhotoId, convFile);
         }
 
-        return result;
+        if(garmentDAO == null) {
+            return null;
+        }
+
+        // TODO Generate Texture
+
+        // TODO Vision API call
+
+        GarmentDTOMapper garmentDTOMapper = applicationContext.getBean(GarmentDTOMapper.class);
+        return garmentDTOMapper.basicDaoToDto(garmentDAO);
 
     }
 
     /////////////////////
-    // PRIVATE METHODS //
+    // PUBLIC METHODS //
     /////////////////////
 
     public String uploadImage(File file) {
@@ -233,42 +144,14 @@ public class WardrobeService {
             String userGarment,
             @MultipartPhoto MultipartFile photo) throws IOException {
 
-        GarmentDTO garmentDTO = GarmentDTO.getJson(userGarment);
-        // 10/11/2023, l'svg non serve più, sad story
-        // String svgId = DAORelevantDataUtils.getSvgId(garmentDTO.getSubCategory());
-        // Optional<SubcategoryDAO> subcategoryDAO =
-        // subcategoryRepository.findById(svgId);
-        // garmentDTO.setTextureUri(subcategoryDAO.get().getSvg());
+        File convFile = new File(System.getProperty("java.io.tmpdir") + "/" + photo.getOriginalFilename());
+        photo.transferTo(convFile);
 
-        // convert multipart into byte[]
-        byte[] byteArr = photo.getBytes();
-        InputStream inputStream = new ByteArrayInputStream(byteArr);
-
-        // Save Photo in DB
-        GarmentPhotoDAO garmentPhotoDAO = new GarmentPhotoDAO(
-                null,
-                null,
-                userId,
-                photo.getOriginalFilename(),
-                inputStream.readAllBytes(),
-                null);
-        GarmentPhotoDAO savedGarmentPhotoDAO = garmentPhotoRepository.save(garmentPhotoDAO);
-
-        // Mapping DTO -> DAO
-        GarmentDTOMapper garmentDTOMapper = applicationContext.getBean(GarmentDTOMapper.class);
-        GarmentDAO garmentDAO = garmentDTOMapper.basicDtoToDao(garmentDTO);
-        garmentDAO.setUserId(userId);
-        garmentDAO.setPhoto(savedGarmentPhotoDAO);
-
-        // Save Garment in DB
-        GarmentDAO savedGarment = saveGarment(garmentDAO);
-
-        // update Photo in DB
-        garmentPhotoDAO.setGarment(savedGarment);
-        garmentPhotoRepository.save(garmentPhotoDAO);
+        GarmentDAO garmentDAO = wardrobeClient.saveUserGarmentInWardrobeComplete(userId, userGarment, convFile);
 
         // Mapping DAO -> DTO
-        return garmentDTOMapper.daoToDto(savedGarment);
+        GarmentDTOMapper garmentDTOMapper = applicationContext.getBean(GarmentDTOMapper.class);
+        return garmentDTOMapper.daoToDto(garmentDAO);
 
     }
 
@@ -276,16 +159,16 @@ public class WardrobeService {
 
         // Mapping DAO -> DTO
         GarmentDTOMapper garmentDTOMapper = applicationContext.getBean(GarmentDTOMapper.class);
-        List<GarmentDAO> garmentDAOList = userWardrobeRepository.findGarmentsByUserId(userId);
+        List<GarmentDAO> garmentDAOList = wardrobeClient.getUserWardrobe(userId);
         List<GarmentDTO> garmentDTOList = garmentDAOList.stream().map(garmentDTOMapper::daoToDto).toList();
 
         return new WardrobeDTO(userId, garmentDTOList);
 
     }
 
-    public GarmentPhotoDTO getGarmentPhoto(String userId, String garmentPhotoId) {
+    public GarmentPhotoDTO getGarmentPhoto(String userId, String garmentPhotoId) throws IOException {
 
-        GarmentPhotoDAO garmentPhotoDAO = garmentPhotoRepository.findById(garmentPhotoId).get();
+        GarmentPhotoDAO garmentPhotoDAO = wardrobeClient.getGarmentPhotoInfo(userId, garmentPhotoId);
 
         // Mapping DAO -> DTO
         GarmentPhotoDTOMapper garmentPhotoDTOMapper = applicationContext.getBean(GarmentPhotoDTOMapper.class);
@@ -322,7 +205,7 @@ public class WardrobeService {
 
                 String photoId = uriArray[1];
 
-                GarmentPhotoDAO garmentPhotoDAO = garmentPhotoRepository.findById(photoId).get();
+                GarmentPhotoDAO garmentPhotoDAO = wardrobeClient.getGarmentPhotoInfo(userId, photoId);
                 garmentDAO.setPhoto(garmentPhotoDAO);
 
             }
@@ -330,7 +213,7 @@ public class WardrobeService {
         }
 
         // Save Garment in DB
-        GarmentDAO savedGarment = saveGarment(garmentDAO);
+        GarmentDAO savedGarment = saveGarment(userId, garmentDAO);
 
         // Mapping DAO -> DTO
         return garmentDTOMapper.daoToDto(savedGarment);
@@ -340,40 +223,7 @@ public class WardrobeService {
     // service for mock data upload
     public void saveUserMockData(String userId) {
 
-        try {
-
-            String mockJsonPath = "src/main/resources/mockup/mockWardrobeComplete.json";
-            String mockImagesFolder = "src/main/resources/mockup/images/";
-
-            ObjectMapper mapper = new ObjectMapper();
-            GarmentDTO[] garments = mapper
-                    .readValue(new File(mockJsonPath), GarmentDTO[].class);
-            for (int i = 0; i < garments.length; i++) {
-                var garment = garments[i];
-                Path path = Paths.get(
-                        mockImagesFolder,
-                        garment.getTitle().replace(" ", "") + ".jpg");
-                String originalFileName = garment.getTitle() + ".jpg";
-
-                GarmentPhotoDAO garmentPhotoDAO = new GarmentPhotoDAO(
-                        null,
-                        null,
-                        userId,
-                        originalFileName,
-                        Files.readAllBytes(path),
-                        null);
-                GarmentPhotoDAO savedGarmentPhotoDAO = garmentPhotoRepository.save(garmentPhotoDAO);
-                GarmentDTOMapper garmentDTOMapper = applicationContext.getBean(GarmentDTOMapper.class);
-                GarmentDAO garmentDAO = garmentDTOMapper.basicDtoToDao(garment);
-                garmentDAO.setPhoto(savedGarmentPhotoDAO);
-                garmentDAO.setUserId(userId);
-                var saved = saveGarment(garmentDAO);
-                log.debug("saved:" + saved.getGarmentId());
-            }
-
-        } catch (Exception e) {
-            log.debug(userId, e);
-        }
+        mockClient.uploadMockGarments(userId);
 
     }
 
@@ -381,8 +231,7 @@ public class WardrobeService {
 
         // Mapping DAO -> DTO
         GarmentDTOMapper garmentDTOMapper = applicationContext.getBean(GarmentDTOMapper.class);
-        List<GarmentDAO> garmentDAOList = userWardrobeRepository.findGarmentsByUserIdAndCategory(userId,
-                category.getValue().toUpperCase());
+        List<GarmentDAO> garmentDAOList = wardrobeClient.getUserWardrobeCategoriesGarments(userId, category.getValue().toUpperCase());
         List<GarmentDTO> garmentDTOList = garmentDAOList.stream().map(garmentDTOMapper::daoToDto).toList();
 
         return new WardrobeDTO(userId, garmentDTOList);
@@ -397,41 +246,21 @@ public class WardrobeService {
         GarmentPhotoDAO garmentPhotoDAO = garmentDAO.getPhoto();
         if (garmentPhotoDAO != null && garmentPhotoDAO.getPhotoId() != null) {
             String photoId = garmentPhotoDAO.getPhotoId();
-            garmentPhotoRepository.deleteById(photoId);
+            wardrobeClient.deleteUserGarmentPhoto(userId, photoId);
         }
 
-        deleteGarment(garmentId);
+        deleteGarment(userId, garmentId);
 
     }
 
     public GarmentDTO updateUserGarment(String garmentId, String userId, BasicGarmentDTO basicGarmentDTO)
             throws Exception {
 
-        checkGarmentExistance(garmentId, userId);
-
-        // Garment update DAO
+        // DTO -> DAO
         GarmentDTOMapper garmentDTOMapper = applicationContext.getBean(GarmentDTOMapper.class);
         GarmentDAO garmentDAO = garmentDTOMapper.basicDtoToDao(basicGarmentDTO);
-        garmentDAO.setGarmentId(garmentId);
-        garmentDAO.setUserId(userId);
 
-        Optional<GarmentDAO> existingDAO = userWardrobeRepository.findById(garmentId);
-        existingDAO.ifPresent(dao -> {
-            garmentDAO.setPhoto(dao.getPhoto());
-            garmentDAO.setCategory(dao.getCategory());
-            garmentDAO.setSubCategory(dao.getSubCategory());
-            garmentDAO.setFabric(dao.getFabric());
-            garmentDAO.setPattern(dao.getPattern());
-            garmentDAO.setMainColor(dao.getMainColor());
-            garmentDAO.setSecondColor(dao.getSecondColor());
-            garmentDAO.setBrand(dao.getBrand());
-            garmentDAO.setTitle(dao.getTitle());
-            garmentDAO.setSeason(dao.getSeason());
-            garmentDAO.setStyles(dao.getStyles());
-            garmentDAO.setFabric(dao.getFabric());
-        });
-
-        GarmentDAO updatedGarmentDAO = updateGarment(garmentDAO);
+        GarmentDAO updatedGarmentDAO = wardrobeClient.updateUserGarment(garmentId, userId, garmentDAO);
 
         // DAO -> DTO
         return garmentDTOMapper.daoToDto(updatedGarmentDAO);
@@ -440,19 +269,8 @@ public class WardrobeService {
 
     public void deleteUserGarmentPhoto(String userId, String garmentPhotoId) throws Exception {
 
-        GarmentPhotoDAO garmentPhotoDAO = checkGarmentPhotoExistance(userId, garmentPhotoId);
+        wardrobeClient.deleteUserGarmentPhoto(userId, garmentPhotoId);
 
-        // delete photo from DB
-        garmentPhotoRepository.deleteById(garmentPhotoId);
-
-        // update garment from DB
-        if (garmentPhotoDAO.getGarment() != null) {
-
-            GarmentDAO garmentDAO = garmentPhotoDAO.getGarment();
-            garmentDAO.setPhoto(null);
-            userWardrobeRepository.save(garmentDAO);
-
-        }
     }
 
     public BasicGarmentDTO updateUserGarmentPhoto(String userId, String garmentPhotoId, MultipartFile photo)
@@ -472,25 +290,6 @@ public class WardrobeService {
 
     }
 
-    private GarmentDAO saveGarment(GarmentDAO garmentDAO) {
-        // TODO generate season and styles from OpenAI
-        GarmentDAO savedGarment = userWardrobeRepository.save(garmentDAO);
-        wardrobeVectorStoreBuilder.getWardrobeVectorStore().save(savedGarment);
-        return savedGarment;
-    }
-
-    private void deleteGarment(String garmentId) {
-        // delete the garment
-        userWardrobeRepository.deleteById(garmentId);
-        wardrobeVectorStoreBuilder.getWardrobeVectorStore().delete(garmentId);
-    }
-
-    private GarmentDAO updateGarment(GarmentDAO garmentDAO) {
-        GarmentDAO updatedGarment = userWardrobeRepository.save(garmentDAO);
-        wardrobeVectorStoreBuilder.getWardrobeVectorStore().update(garmentDAO);
-        return updatedGarment;
-    }
-
     public void saveUserWardrobe(String userId, List<BasicGarmentDTO> garmentList) {
 
         // DTO -> DAO
@@ -500,26 +299,9 @@ public class WardrobeService {
                 .map(garmentDTOMapper::basicDtoToDao)
                 .toList();
 
-        // delete old entries
-        List<GarmentDAO> oldUserGarments = userWardrobeRepository.findGarmentsByUserId(userId);
-        List<GarmentPhotoDAO> oldUserGarmentsPhoto = oldUserGarments
-                .stream()
-                .map(GarmentDAO::getPhoto)
-                .filter(Objects::nonNull)
-                .toList();
+        wardrobeClient.saveUserWardrobe(userId, garmentDAOList);
 
-        garmentPhotoRepository.deleteAll(oldUserGarmentsPhoto);
-        oldUserGarments.forEach(garmentDAO -> {
-            deleteGarment(garmentDAO.getGarmentId());
-        });
-
-        // create new entries
-        garmentDAOList.forEach(garmentDAO -> {
-            garmentDAO.setUserId(userId);
-            saveGarment(garmentDAO);
-        });
-
-        // Update Vectorial DB
+        // TODO Update Vectorial DB
 
     }
 }

@@ -14,5 +14,10 @@ public class ServiceConfigurationProperties {
 	@EqualsAndHashCode(callSuper = true)
 	public class GlamUserClientProperties extends GlamServiceProperties {}
 
+	@Data
+	@Configuration
+	@ConfigurationProperties(prefix = "service.glam.services.wardrobe")
+	@EqualsAndHashCode(callSuper = true)
+	public class GlamWardrobeClientProperties extends GlamServiceProperties {}
 
 }

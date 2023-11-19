@@ -5,13 +5,12 @@ import com.glam.bff.dto.garment.GarmentDTO;
 import com.glam.bff.dto.garment.GarmentPhotoDTO;
 import com.glam.bff.dto.garment.enums.CategoryEnum;
 import com.glam.bff.dto.wardrobe.WardrobeDTO;
-import com.glam.bff.repository.UserOutfitRepository;
-import com.glam.bff.repository.UserWardrobeRepository;
 import com.glam.bff.service.WardrobeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static com.glam.bff.utils.Constants.*;
@@ -36,15 +36,6 @@ public class WardrobeController {
 
         @Autowired
         private WardrobeService wardrobeService;
-
-        private final UserOutfitRepository userOutfitRepository;
-        private final UserWardrobeRepository userWardrobeRepository;
-
-        public WardrobeController(UserOutfitRepository userOutfitRepository,
-                        UserWardrobeRepository userWardrobeRepository) {
-                this.userOutfitRepository = userOutfitRepository;
-                this.userWardrobeRepository = userWardrobeRepository;
-        }
 
         @GetMapping("/users/{userId}")
         @Tag(name = "Wardrobe")
@@ -102,7 +93,7 @@ public class WardrobeController {
                         @PathVariable(USER_ID) final String userId,
                         @RequestBody BasicGarmentDTO userGarment) throws Exception {
 
-                return wardrobeService.saveUserGarmentInWardrobe(userId, userGarment);
+                        return wardrobeService.saveUserGarmentInWardrobe(userId, userGarment);
 
         }
 
@@ -145,6 +136,17 @@ public class WardrobeController {
                 }
 
                 return new ResponseEntity<>(garmentPhotoDTO.getPhoto(), headers, HttpStatus.OK);
+
+        }
+
+        @GetMapping("/users/{userId}/garments/photo/{garmentPhotoId}/info")
+        @Tag(name = "Wardrobe")
+        @Operation(summary = "API to get the user garment's photo info in GLAM", description = "Used to get the garment's photo info")
+        public GarmentPhotoDTO getGarmentPhotoInfo(
+                @PathVariable(USER_ID) final String userId,
+                @PathVariable(GARMENT_PHOTO_ID) final String garmentPhotoId) throws Exception {
+
+                return wardrobeService.getGarmentPhoto(userId, garmentPhotoId);
 
         }
 
