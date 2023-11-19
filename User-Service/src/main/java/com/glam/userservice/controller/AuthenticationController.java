@@ -28,7 +28,7 @@ public class AuthenticationController {
 
     authenticationService.registerUser(body);
 
-    return HttpStatus.OK;
+    return HttpStatusCode.valueOf(200);
   }
 
   @PostMapping("/login")
