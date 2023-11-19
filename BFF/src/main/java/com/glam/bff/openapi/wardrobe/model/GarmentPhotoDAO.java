@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import jakarta.annotation.Nullable;
 
 /**
  * GarmentPhotoDAO
@@ -67,7 +68,7 @@ public class GarmentPhotoDAO {
    * Get photoId
    * @return photoId
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_PHOTO_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -93,7 +94,7 @@ public class GarmentPhotoDAO {
    * Get garmentId
    * @return garmentId
   **/
-  @javax.annotation.Nullable
+   @Nullable
   @JsonProperty(JSON_PROPERTY_GARMENT_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -119,7 +120,7 @@ public class GarmentPhotoDAO {
    * Get userId
    * @return userId
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_USER_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -145,7 +146,7 @@ public class GarmentPhotoDAO {
    * Get fileName
    * @return fileName
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_FILE_NAME)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -171,7 +172,7 @@ public class GarmentPhotoDAO {
    * Get photo
    * @return photo
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_PHOTO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -197,7 +198,7 @@ public class GarmentPhotoDAO {
    * Get textureUri
    * @return textureUri
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_TEXTURE_URI)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 

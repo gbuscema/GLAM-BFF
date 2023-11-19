@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import jakarta.annotation.Nullable;
 
 /**
  * UserDAO
@@ -89,7 +90,7 @@ public class UserDAO {
    * Get userId
    * @return userId
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_USER_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -115,7 +116,7 @@ public class UserDAO {
    * Get email
    * @return email
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_EMAIL)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -141,7 +142,7 @@ public class UserDAO {
    * Get password
    * @return password
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_PASSWORD)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -167,7 +168,7 @@ public class UserDAO {
    * Get firstName
    * @return firstName
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_FIRST_NAME)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -193,7 +194,7 @@ public class UserDAO {
    * Get lastName
    * @return lastName
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_LAST_NAME)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -219,7 +220,7 @@ public class UserDAO {
    * Get gender
    * @return gender
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_GENDER)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -245,7 +246,7 @@ public class UserDAO {
    * Get locationAgreement
    * @return locationAgreement
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_LOCATION_AGREEMENT)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -271,7 +272,7 @@ public class UserDAO {
    * Get fashionCanon
    * @return fashionCanon
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_FASHION_CANON)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -305,7 +306,7 @@ public class UserDAO {
    * Get styles
    * @return styles
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_STYLES)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -331,7 +332,7 @@ public class UserDAO {
    * Get livingLocation
    * @return livingLocation
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_LIVING_LOCATION)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -365,7 +366,7 @@ public class UserDAO {
    * Get season
    * @return season
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_SEASON)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 

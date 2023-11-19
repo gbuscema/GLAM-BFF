@@ -2,8 +2,6 @@ package com.glam.bff.dto.garment.enums;
 
 import java.util.List;
 
-import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.netlib.util.floatW;
 
 public enum SubCategoryEnum {
 
@@ -69,25 +67,4 @@ public enum SubCategoryEnum {
     return category;
   }
 
-  public static SubCategoryEnum searchMatch(String valueToMatch) {
-    var stringComparer = new LevenshteinDistance();
-    var values = List.of(SubCategoryEnum.values());
-    var normalizedValueToMatch = valueToMatch.toLowerCase();
-    SubCategoryEnum mappedValue = null;
-    var minDistance = Float.MAX_VALUE;
-    for (SubCategoryEnum value : values) {
-      var distance = stringComparer.apply(value.value.toLowerCase(), normalizedValueToMatch);
-
-      if (distance < minDistance) {
-        minDistance = distance;
-        mappedValue = value;
-      }
-      // if (value.value.toLowerCase().contains(normalizedValueToMatch))
-      // mappedValue = value;
-    }
-    System.out.println(valueToMatch);
-    System.out.println(minDistance);
-    System.out.println(mappedValue.value);
-    return minDistance < 2 ? mappedValue : null;
-  }
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import com.glam.bff.client.wardrobe.MockClient;
 import com.glam.bff.client.wardrobe.WardrobeClient;
 import com.glam.bff.dto.garment.enums.CategoryEnum;
-import com.glam.bff.dto.polycam.StableDiffusionResponseDTO;
 import com.glam.bff.openapi.wardrobe.model.GarmentDAO;
 import com.glam.bff.openapi.wardrobe.model.GarmentPhotoDAO;
 import org.springframework.core.io.FileSystemResource;
@@ -28,7 +27,6 @@ import com.glam.bff.dto.wardrobe.WardrobeDTO;
 import com.glam.bff.mapper.wardrobe.GarmentDTOMapper;
 import com.glam.bff.mapper.wardrobe.GarmentPhotoDTOMapper;
 import com.glam.bff.validators.MultipartPhoto;
-import com.google.cloud.spring.vision.CloudVisionTemplate;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,9 +41,6 @@ public class WardrobeService {
     private WardrobeClient wardrobeClient;
     @Autowired
     private MockClient mockClient;
-
-    @Autowired
-    private CloudVisionTemplate cloudVisionTemplate;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -117,27 +112,6 @@ public class WardrobeService {
     /////////////////////
     // PUBLIC METHODS //
     /////////////////////
-
-    public String uploadImage(File file) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        LinkedMultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", new FileSystemResource(file));
-
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-        ResponseEntity<StableDiffusionResponseDTO> response = restTemplate.postForEntity(
-                "https://5918-87-10-241-96.ngrok-free.app/upload", requestEntity, StableDiffusionResponseDTO.class);
-
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return Objects.requireNonNull(response.getBody()).getTextureUri();
-        } else {
-            return "";
-        }
-    }
 
     public GarmentDTO saveUserGarmentInWardrobeComplete(
             String userId,

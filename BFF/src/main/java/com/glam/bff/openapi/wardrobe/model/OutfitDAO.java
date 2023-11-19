@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import jakarta.annotation.Nullable;
 
 /**
  * OutfitDAO
@@ -70,7 +71,7 @@ public class OutfitDAO {
    * Get outfitId
    * @return outfitId
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_OUTFIT_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -96,7 +97,7 @@ public class OutfitDAO {
    * Get userId
    * @return userId
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_USER_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -122,7 +123,7 @@ public class OutfitDAO {
    * Get name
    * @return name
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_NAME)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -148,7 +149,7 @@ public class OutfitDAO {
    * Get layout
    * @return layout
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_LAYOUT)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -174,7 +175,7 @@ public class OutfitDAO {
    * Get isFavorite
    * @return isFavorite
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_IS_FAVORITE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -208,7 +209,7 @@ public class OutfitDAO {
    * Get garmentList
    * @return garmentList
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_GARMENT_LIST)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 

@@ -2,10 +2,7 @@ package com.glam.bff.dto.garment.enums;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.text.similarity.LevenshteinDistance;
 
 public enum CategoryEnum {
 
@@ -46,22 +43,4 @@ public enum CategoryEnum {
     return value;
   }
 
-  public static CategoryEnum searchMatch(String valueToMatch) {
-    var stringComparer = new LevenshteinDistance();
-    var values = List.of(CategoryEnum.values());
-    var normalizedValueToMatch = valueToMatch.toLowerCase();
-    CategoryEnum mappedValue = null;
-    var minDistance = Integer.MAX_VALUE;
-    for (CategoryEnum value : values) {
-      var distance = stringComparer.apply(value.value.toLowerCase(), normalizedValueToMatch);
-
-      if (distance < minDistance) {
-        minDistance = distance;
-        mappedValue = value;
-      }
-      // if (value.value.toLowerCase().contains(normalizedValueToMatch))
-      // mappedValue = value;
-    }
-    return minDistance < 2 ? mappedValue : null;
-  }
 }

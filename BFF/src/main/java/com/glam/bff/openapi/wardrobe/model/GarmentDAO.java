@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import jakarta.annotation.Nullable;
 
 /**
  * GarmentDAO
@@ -130,7 +131,7 @@ public class GarmentDAO {
    * Get garmentId
    * @return garmentId
   **/
-  @javax.annotation.Nullable
+   @Nullable
   @JsonProperty(JSON_PROPERTY_GARMENT_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -156,7 +157,7 @@ public class GarmentDAO {
    * Get photo
    * @return photo
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_PHOTO)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -182,7 +183,7 @@ public class GarmentDAO {
    * Get userId
    * @return userId
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_USER_ID)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -208,7 +209,7 @@ public class GarmentDAO {
    * Get title
    * @return title
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_TITLE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -234,7 +235,7 @@ public class GarmentDAO {
    * Get description
    * @return description
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_DESCRIPTION)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -260,7 +261,7 @@ public class GarmentDAO {
    * Get category
    * @return category
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_CATEGORY)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -286,7 +287,7 @@ public class GarmentDAO {
    * Get subCategory
    * @return subCategory
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_SUB_CATEGORY)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -312,7 +313,7 @@ public class GarmentDAO {
    * Get mainColor
    * @return mainColor
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_MAIN_COLOR)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -338,7 +339,7 @@ public class GarmentDAO {
    * Get secondColor
    * @return secondColor
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_SECOND_COLOR)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -364,7 +365,7 @@ public class GarmentDAO {
    * Get pattern
    * @return pattern
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_PATTERN)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -390,7 +391,7 @@ public class GarmentDAO {
    * Get brand
    * @return brand
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_BRAND)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -416,7 +417,7 @@ public class GarmentDAO {
    * Get isFavorite
    * @return isFavorite
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_IS_FAVORITE)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -442,7 +443,7 @@ public class GarmentDAO {
    * Get fabric
    * @return fabric
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_FABRIC)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -468,7 +469,7 @@ public class GarmentDAO {
    * Get condition
    * @return condition
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_CONDITION)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -494,7 +495,7 @@ public class GarmentDAO {
    * Get sleeveLength
    * @return sleeveLength
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_SLEEVE_LENGTH)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -520,7 +521,7 @@ public class GarmentDAO {
    * Get length
    * @return length
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_LENGTH)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -546,7 +547,7 @@ public class GarmentDAO {
    * Get sizeEnum
    * @return sizeEnum
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_SIZE_ENUM)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -572,7 +573,7 @@ public class GarmentDAO {
    * Get patternDetail
    * @return patternDetail
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_PATTERN_DETAIL)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -606,7 +607,7 @@ public class GarmentDAO {
    * Get season
    * @return season
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_SEASON)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -640,7 +641,7 @@ public class GarmentDAO {
    * Get styles
    * @return styles
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_STYLES)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
@@ -666,7 +667,7 @@ public class GarmentDAO {
    * Get photoUri
    * @return photoUri
   **/
-  @javax.annotation.Nullable
+  @Nullable
   @JsonProperty(JSON_PROPERTY_PHOTO_URI)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 

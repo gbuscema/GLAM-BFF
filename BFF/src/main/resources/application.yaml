@@ -3,23 +3,9 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
-  data:
-    mongodb:
-      uri: "mongodb+srv://glam-admin:glam-admin@mongodb-glam.ia09xqm.mongodb.net/glam?retryWrites=true&w=majority"
-  ai:
-    openai:
-      model: "gpt-4-1106-preview"
-      apiKey: "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"
   jackson:
     default-property-inclusion: NON_NULL
   authorization-enabled: false
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8080/auth/realms/master
-          jwk-set-uri: http://localhost:8080/auth/realms/master/protocol/openid-connect/certs
-
 logging:
   level:
     com.glam.bff: "DEBUG"
@@ -30,9 +16,6 @@ logging:
 
 server:
   port: 8080
-# Temporary disabled for testing
-#  servlet:
-#    context-path: /resource-server
 
 springdoc:
   swagger-ui:
