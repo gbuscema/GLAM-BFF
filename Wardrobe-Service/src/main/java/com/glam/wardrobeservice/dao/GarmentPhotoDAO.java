@@ -24,7 +24,7 @@ public class GarmentPhotoDAO {
 
     private String fileName;
 
-    @Schema(name = "photo",  required = true, type = "string", format = "binary")
+    @Schema(name = "photo", type = "string", format = "byte")
     private byte[] photo;
 
     private String textureUri;
