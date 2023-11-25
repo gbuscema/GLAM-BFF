@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Response
 from openai import OpenAI
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
@@ -12,7 +12,7 @@ from rembg import remove
 import numpy as np
 
 # OpenAI API Key
-api_key = "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"
+api_key = "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"
 
 client = OpenAI(
     api_key=api_key,
@@ -38,7 +38,7 @@ Fill the following json with what you see in the garment image:
   "condition": "{condition}",
   "sleeveLength": "{sleeveLength}",
   "length": "{length}",
-  "sizeEnum": "{sizeEnum}",
+  "size": "{sizeEnum}",
   "patternDetail": "{patternDetail}",
   "season": ["{season1}", "{season2}", "..."],
   "styles": ["{style1}", "{style2}", "..."]
@@ -119,6 +119,25 @@ The possible styles are: [
   "Zebra-Print",
   "Python-Print"
 ]
+The possible patterns are: [
+  "Stripes",
+  "Dots",
+  "Floral",
+  "Geometric",
+  "Animal-Print",
+  "Solid-Color";
+]
+The possible pattern details are: [
+  "Orizontal-Stripes",
+  "Vertical-Stripes",
+  "Oblique-Stripes",
+  "Big-Dots",
+  "Small-Dots",
+  "Hawaiian",
+  "Leopard-Print",
+  "Zebra-Print",
+  "Python-Print"
+]
 The possible fabric are: [
   "Cotton",
   "Polyester",
@@ -137,7 +156,7 @@ The possible fabric are: [
   "Lycra",
   "Microfiber"
 ]
-The possible conditions are: [
+The possible condition are: [
   "New",
   "Excellent-Condition",
   "Used-Few-Times",
@@ -162,6 +181,7 @@ The possible length are: [
 DO NOT CHANGE THE JSON STRUCTURE
 DO NOT ADD ANYTHING ELSE TO THE JSON
 RETURN ONLY THE JSON OBJECT
+IF UNABLE TO DEFINE A PROPERTY USE "Undefined" AS VALUE
 """
 
 class AnalyzeResponseModel(BaseModel):
@@ -216,7 +236,8 @@ async def analyze(file: UploadFile = File(...)):
         }
 
         response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
-        return JSONResponse(status_code=200, content=response.json()["choices"][0]["message"]["content"])
+        print(response.json())
+        return Response(status_code=200, content=response.json()["choices"][0]["message"]["content"], media_type="application/json")
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": str(e)})
 
