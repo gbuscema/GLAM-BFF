@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BFF/glam-bff.iml" filepath="$PROJECT_DIR$/BFF/glam-bff.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/GlamVisionApi.iml" filepath="$PROJECT_DIR$/.idea/GlamVisionApi.iml" />
     </modules>
   </component>
 </project>

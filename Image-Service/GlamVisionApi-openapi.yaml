@@ -1,0 +1,91 @@
+openapi: "3.0.3"
+info:
+  title: "GlamVisionApi API"
+  description: "GlamVisionApi API"
+  version: "1.0.0"
+servers:
+  - url: "https://GlamVisionApi"
+paths:
+  /api/analyze:
+    post:
+      summary: "POST api/analyze"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeResponse'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        required: true
+  /api/texture:
+    post:
+      summary: "POST api/texture"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  textureUri:
+                    type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        required: true
+
+components:
+  schemas:
+    AnalyzeResponse:
+      type: object
+      properties:
+        description:
+          type: string
+        category:
+          type: string
+        subCategory:
+          type: string
+        mainColor:
+          type: string
+        secondColor:
+          type: string
+        pattern:
+          type: string
+        brand:
+          type: string
+        fabric:
+          type: string
+        condition:
+          type: string
+        sleeveLength:
+          type: string
+        length:
+          type: string
+        sizeEnum:
+          type: string
+        patternDetail:
+          type: string
+        season:
+          type: array
+          items:
+            type: string
+        styles:
+          type: array
+          items:
+            type: string

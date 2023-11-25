@@ -1,0 +1,28 @@
+POST http://127.0.0.1:8000/api/analyze
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="foto1.png"
+
+< ./foto1.png
+--WebAppBoundary--
+
+###
+POST http://127.0.0.1:8000/api/analyze
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="foto2.png"
+
+< ./foto2.png
+--WebAppBoundary--
+
+###
+POST http://127.0.0.1:8000/api/texture
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="foto2.png"
+
+< ./foto2.png
+--WebAppBoundary--
